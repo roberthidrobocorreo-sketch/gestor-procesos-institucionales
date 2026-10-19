@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión — Gestor Institucional | Escuela "Las Américas"</title>
+    <meta name="description" content="Sistema de Gestión de Procesos Institucionales de la Escuela Las Américas">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0b5e7b 0%, #1381a2 40%, #1796ba 100%);
+            padding: 1.5rem;
+        }
+        .login-card {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+            transition: all 0.3s ease;
+        }
+        .login-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 2.2rem;
+        }
+        .login-brand-logo {
+            width: 62px;
+            height: 62px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+            flex-shrink: 0;
+        }
+        .login-brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #0d5e7a;
+            line-height: 1.15;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .login-brand-title span {
+            display: block;
+        }
+        .field-group {
+            margin-bottom: 1.25rem;
+        }
+        .pill-input {
+            width: 100%;
+            padding: 1rem 1.4rem;
+            background: #d8dce2;
+            border: 2px solid transparent;
+            border-radius: 50px;
+            font-family: 'Public Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+        .pill-input::placeholder {
+            color: #64748b;
+            font-weight: 400;
+        }
+        .pill-input:focus {
+            background: #ffffff;
+            border-color: #1381a2;
+            box-shadow: 0 0 0 4px rgba(19, 129, 162, 0.18);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #0b5e7b, #1381a2);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-top: 0.6rem;
+            letter-spacing: 0.4px;
+            box-shadow: 0 8px 20px rgba(19, 129, 162, 0.35);
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(19, 129, 162, 0.45);
+        }
+        .login-btn:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: not-allowed;
+        }
+        .error-msg {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            margin-bottom: 1.2rem;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+        .login-footer-note {
+            text-align: center;
+            margin-top: 1.8rem;
+            font-size: 0.82rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <!-- ENCABEZADO CON ESCUDO Y TÍTULO FIEL AL DISEÑO -->
+        <div class="login-brand">
+            <img src="/img/escudo.png" alt="Escuela Las Américas" class="login-brand-logo">
+            <div class="login-brand-title">
+                <span>GESTOR DE PROCESOS</span>
+                <span>INSTITUCIONALES</span>
+            </div>
+        </div>
+
+        <div class="error-msg" id="mensaje-error"></div>
+
+        <form id="formLogin">
+            <div class="field-group">
+                <input type="text" id="usuario" name="usuario" class="pill-input" placeholder="Usuario" required autocomplete="username">
+            </div>
+
+            <div class="field-group">
+                <input type="password" id="contrasena" name="contrasena" class="pill-input" placeholder="Contraseña" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="login-btn" id="btnLogin">Entrar al Sistema</button>
+        </form>
+
+        <p class="login-footer-note">Escuela "Las Américas" &mdash; Acceso Restringido</p>
+    </div>
+
+    <script src="/scripts/login.js"></script>
+</body>
+</html>

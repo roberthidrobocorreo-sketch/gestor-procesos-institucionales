@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajustes y Configuración — Gestor Institucional</title>
+    <meta name="description" content="Configuración general del sistema institucional y tablero de avisos">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        @media (max-width: 992px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .settings-card {
+            background: #ffffff;
+            border-radius: var(--radius-lg, 22px);
+            padding: 1.8rem;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .settings-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .settings-card-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .settings-card-header svg {
+            width: 24px;
+            height: 24px;
+            color: var(--sidebar-bg, #1381a2);
+        }
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 1.2rem;
+        }
+        .form-row label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #334155;
+        }
+        .form-row input, .form-row textarea, .form-row select {
+            width: 100%;
+            padding: 0.75rem 0.95rem;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-family: 'Public Sans', sans-serif;
+            font-size: 0.92rem;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+            border-color: #1381a2;
+            box-shadow: 0 0 0 3px rgba(19, 129, 162, 0.15);
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1.25rem;
+        }
+        .avisos-admin-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        .aviso-admin-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+        }
+        .aviso-admin-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.92rem;
+        }
+        .aviso-admin-date {
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+        .btn-delete-small {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+        .btn-delete-small:hover {
+            background: #fecaca;
+        }
+    </style>
+</head>
+<body>
+
+<%- include('partials/sidebar') %>
+
+<main class="main-wrapper">
+
+    <!-- ENCABEZADO -->
+    <div class="section-header-box">
+        <div>
+            <h1 class="section-title">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Ajustes del Sistema
+            </h1>
+            <p class="section-subtitle">Configuración institucional, perfil administrativo y gestión de avisos</p>
+        </div>
+    </div>
+
+    <div class="settings-grid">
+
+        <!-- TARJETA 1: AJUSTES INSTITUCIONALES Y PERFIL -->
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+                <h2>Datos Institucionales y Usuario</h2>
+            </div>
+
+            <form id="formAjustes">
+                <div class="form-row">
+                    <label for="nombre_completo">Nombre Completo del Responsable</label>
+                    <input type="text" id="nombre_completo" name="nombre_completo" value="<%= (usuario && usuario.nombre_completo) || 'LILIAN TINTORI' %>" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="nueva_contrasena">Cambiar Contraseña (opcional)</label>
+                    <input type="password" id="nueva_contrasena" name="nueva_contrasena" placeholder="Dejar en blanco para no modificar">
+                </div>
+
+                <div class="form-row">
+                    <label for="nombre_institucion">Nombre de la Institución</label>
+                    <input type="text" id="nombre_institucion" name="nombre_institucion" value="<%= (configuracion && configuracion.nombre_institucion) || 'Escuela \"Las Américas\"' %>" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="codigo_dea">Código DEA</label>
+                    <input type="text" id="codigo_dea" name="codigo_dea" value="<%= (configuracion && configuracion.codigo_dea) || 'OD-04511503' %>">
+                </div>
+
+                <div class="form-row">
+                    <label for="ano_escolar">Año Escolar</label>
+                    <input type="text" id="ano_escolar" name="ano_escolar" value="<%= (configuracion && configuracion.ano_escolar) || '2025 - 2026' %>">
+                </div>
+
+                <div class="form-row">
+                    <label for="director">Director / Directora</label>
+                    <input type="text" id="director" name="director" value="<%= (configuracion && configuracion.director) || 'Lcda. María Elena Rivas' %>">
+                </div>
+
+                <div class="form-row">
+                    <label for="contacto">Teléfono de Contacto</label>
+                    <input type="text" id="contacto" name="contacto" value="<%= (configuracion && configuracion.contacto) || '0212-555-0192' %>">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="btnGuardarAjustes">
+                        Guardar Ajustes
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TARJETA 2: TABLERO DE AVISOS -->
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <h2>Publicar Aviso en el Tablero</h2>
+            </div>
+
+            <form id="formNuevoAviso">
+                <div class="form-row">
+                    <label for="titulo">Título del Aviso</label>
+                    <input type="text" id="titulo" name="titulo" placeholder="Ej: Entrega de Boletas" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="prioridad">Prioridad</label>
+                    <select id="prioridad" name="prioridad">
+                        <option value="Normal">Normal</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Urgente">Urgente</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="contenido">Contenido del Aviso</label>
+                    <textarea id="contenido" name="contenido" rows="3" placeholder="Redacte el mensaje del aviso para el panel de inicio..." required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="btnPublicarAviso">
+                        Publicar Aviso
+                    </button>
+                </div>
+            </form>
+
+            <div style="margin-top: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; color: #334155;">Avisos Activos</h3>
+                    <% if (avisos && avisos.length > 0) { %>
+                    <button type="button" onclick="vaciarTodosLosAvisos()" class="btn-delete-small">
+                        Vaciar Bandeja
+                    </button>
+                    <% } %>
+                </div>
+
+                <div class="avisos-admin-list">
+                    <% if (!avisos || avisos.length === 0) { %>
+                    <p style="font-size: 0.88rem; color: #94a3b8; text-align: center; padding: 1.5rem;">No hay avisos publicados en el tablero.</p>
+                    <% } else { %>
+                        <% avisos.forEach(function(av) { %>
+                        <div class="aviso-admin-item">
+                            <div>
+                                <div class="aviso-admin-title"><%= av.titulo %> <span style="font-size: 0.75rem; color: #0284c7;">[<%= av.prioridad %>]</span></div>
+                                <div class="aviso-admin-date"><%= av.fecha %> — <%= av.autor %></div>
+                            </div>
+                            <button type="button" onclick="eliminarAvisoItem(<%= av.id %>)" class="btn-delete-small">
+                                Eliminar
+                            </button>
+                        </div>
+                        <% }); %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<div id="toastNotification" class="toast-notification"></div>
+
+<script src="/scripts/ui.js"></script>
+<script>
+    // Formulario Ajustes
+    const formAjustes = document.getElementById('formAjustes');
+    if (formAjustes) {
+        formAjustes.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardarAjustes');
+            btn.disabled = true;
+            const formData = new FormData(formAjustes);
+
+            try {
+                const resp = await fetch('/guardarAjustes', {
+                    method: 'POST',
+                    body: formData
+                });
+                const res = await resp.json();
+                if (res.exito) {
+                    showToast(res.mensaje || 'Ajustes guardados correctamente');
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    showToast(res.mensaje || 'Error al guardar ajustes', 'error');
+                }
+            } catch (err) {
+                showToast('Error de red al guardar ajustes', 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    }
+
+    // Formulario Nuevo Aviso
+    const formNuevoAviso = document.getElementById('formNuevoAviso');
+    if (formNuevoAviso) {
+        formNuevoAviso.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnPublicarAviso');
+            btn.disabled = true;
+            const formData = new FormData(formNuevoAviso);
+
+            try {
+                const resp = await fetch('/nuevoAviso', {
+                    method: 'POST',
+                    body: formData
+                });
+                const res = await resp.json();
+                if (res.exito) {
+                    showToast(res.mensaje || 'Aviso publicado');
+                    formNuevoAviso.reset();
+                    setTimeout(() => location.reload(), 700);
+                } else {
+                    showToast(res.mensaje || 'Error al publicar aviso', 'error');
+                }
+            } catch (err) {
+                showToast('Error de red al publicar aviso', 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    }
+
+    // Eliminar Aviso individual
+    async function eliminarAvisoItem(id) {
+        if (!confirm('¿Desea eliminar este aviso?')) return;
+        try {
+            const resp = await fetch(`/eliminarAviso/${id}`, { method: 'DELETE' });
+            const res = await resp.json();
+            if (res.exito) {
+                showToast('Aviso eliminado');
+                setTimeout(() => location.reload(), 600);
+            } else {
+                showToast(res.mensaje || 'Error al eliminar', 'error');
+            }
+        } catch (err) {
+            showToast('Error de red', 'error');
+        }
+    }
+
+    // Vaciar Avisos
+    async function vaciarTodosLosAvisos() {
+        if (!confirm('¿Desea vaciar todos los avisos del tablero?')) return;
+        try {
+            const resp = await fetch('/vaciarAvisos', { method: 'DELETE' });
+            const res = await resp.json();
+            if (res.exito) {
+                showToast('Bandeja de avisos vaciada');
+                setTimeout(() => location.reload(), 600);
+            }
+        } catch (err) {
+            showToast('Error de red', 'error');
+        }
+    }
+</script>
+</body>
+</html>

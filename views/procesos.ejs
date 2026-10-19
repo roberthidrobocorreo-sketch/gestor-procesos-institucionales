@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procesos Institucionales | Escuela "Las Américas"</title>
+    <meta name="description" content="Gestión de procesos y trámites estudiantiles de la Escuela Las Américas">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<%- include('partials/sidebar') %>
+
+<main class="main-wrapper">
+
+    <!-- ENCABEZADO -->
+    <div class="section-header-box">
+        <div>
+            <h1 class="section-title">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Procesos
+            </h1>
+            <p class="section-subtitle">Registro y seguimiento de trámites estudiantiles institucionales</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="abrirModalNuevoProceso()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14"/>
+                </svg>
+                Nuevo Proceso
+            </button>
+        </div>
+    </div>
+
+    <!-- BARRA DE FILTROS -->
+    <div class="toolbar-container">
+        <div class="search-input-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="searchProcessInput" class="search-field" placeholder="Buscar por estudiante o cédula...">
+        </div>
+        <select id="filterTipoProceso" class="filter-select">
+            <option value="">Todos los tipos</option>
+            <option value="Carta de Retiro">Carta de Retiro</option>
+            <option value="Constancia de Estudio">Constancia de Estudio</option>
+            <option value="Cambio de Inf. Personal">Cambio de Inf. Personal</option>
+            <option value="Boletín Inf. I">Boletín Inf. I</option>
+            <option value="Boletín Inf. II">Boletín Inf. II</option>
+            <option value="Boletín Inf. III">Boletín Inf. III</option>
+            <option value="Carnet Estudiantil">Carnet Estudiantil</option>
+            <option value="Inscripción">Inscripción</option>
+            <option value="Traslado">Traslado</option>
+            <option value="Solicitud de Documentos">Solicitud de Documentos</option>
+        </select>
+        <select id="filterEstadoProceso" class="filter-select">
+            <option value="">Todos los estados</option>
+            <option value="Completado">Completado</option>
+            <option value="En Trámite">En Trámite</option>
+            <option value="Pendiente">Pendiente</option>
+        </select>
+        <span style="font-size: 0.85rem; color: #64748b; white-space: nowrap;">
+            <strong><%= procesos.length %></strong> registros
+        </span>
+    </div>
+
+    <!-- TABLA DE PROCESOS -->
+    <div class="table-card-wrapper">
+        <table class="custom-data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Estudiante</th>
+                    <th>Grado / Sección</th>
+                    <th>Tipo de Proceso</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Descripción</th>
+                    <th style="text-align: center;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (procesos && procesos.length > 0) { %>
+                    <% procesos.forEach(function(proc) { %>
+                    <tr class="process-table-row"
+                        data-estudiante="<%= (proc.nombre + ' ' + proc.apellido).toLowerCase() %>"
+                        data-cedula="<%= proc.estudiante_cedula.toLowerCase() %>"
+                        data-tipo="<%= proc.tipo_proceso %>"
+                        data-estado="<%= proc.estado %>">
+                        <td style="color: #94a3b8; font-size: 0.85rem;">#<%= proc.id %></td>
+                        <td>
+                            <div class="student-meta-cell">
+                                <div class="student-avatar-badge" style="width:32px;height:32px;font-size:0.75rem;">
+                                    <%= (proc.nombre.charAt(0) + proc.apellido.charAt(0)).toUpperCase() %>
+                                </div>
+                                <div>
+                                    <div class="student-main-name"><%= proc.nombre %> <%= proc.apellido %></div>
+                                    <div class="student-sub-cedula">C.I: <%= proc.estudiante_cedula %></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><%= proc.ano %> "<%= proc.seccion %>"</td>
+                        <td style="font-weight: 600; color: #334155;"><%= proc.tipo_proceso %></td>
+                        <td style="font-size: 0.88rem; color: #64748b; min-width: 140px;"><%= proc.fecha %></td>
+                        <td>
+                            <span class="status-pill <%= proc.estado === 'Completado' ? 'completado' : proc.estado === 'En Trámite' ? 'tramite' : 'pendiente' %>">
+                                <span class="status-indicator-dot" style="width:7px;height:7px;box-shadow:none; background: <%= proc.estado === 'Completado' ? '#15803d' : proc.estado === 'En Trámite' ? '#b45309' : '#0369a1' %>"></span>
+                                <%= proc.estado %>
+                            </span>
+                        </td>
+                        <td style="font-size: 0.85rem; color: #64748b; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <%= proc.descripcion || '—' %>
+                        </td>
+                        <td>
+                            <div class="table-action-btns" style="justify-content: center;">
+                                <!-- Imprimir -->
+                                <a href="/imprimirProceso/<%= proc.id %>" target="_blank" class="action-icon-btn" title="Ver constancia">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                                    </svg>
+                                </a>
+                                <!-- Editar -->
+                                <button class="action-icon-btn" title="Editar proceso"
+                                    data-id="<%= proc.id %>"
+                                    data-estudiante="<%= proc.nombre %> <%= proc.apellido %>"
+                                    data-cedula="<%= proc.estudiante_cedula %>"
+                                    data-tipo="<%= proc.tipo_proceso %>"
+                                    data-fecha="<%= proc.fecha %>"
+                                    data-estado="<%= proc.estado %>"
+                                    data-descripcion="<%= (proc.descripcion || '').replace(/"/g, '&quot;') %>"
+                                    onclick="abrirModalEditarProceso(this)">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </button>
+                                <!-- Eliminar -->
+                                <button class="action-icon-btn delete" title="Eliminar proceso"
+                                    onclick="eliminarProceso(<%= proc.id %>, '<%= proc.tipo_proceso %>')">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }); %>
+                <% } %>
+                <tr id="noResultsProcessRow" style="display: none;">
+                    <td colspan="8" style="text-align: center; padding: 3rem; color: #94a3b8;">Sin resultados para la búsqueda.</td>
+                </tr>
+                <% if (!procesos || procesos.length === 0) { %>
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 4rem; color: #94a3b8;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 1rem; opacity: 0.4; display: block;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <p style="font-size: 1.1rem; font-weight: 500;">No hay procesos registrados.</p>
+                    </td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+<!-- MODAL: NUEVO PROCESO -->
+<div class="modal-overlay" id="modalNuevoProceso">
+    <div class="modal-dialog" style="max-width: 540px;">
+        <div class="modal-header">
+            <h3>Registrar Nuevo Proceso</h3>
+            <button class="btn-close-modal" onclick="cerrarModal('modalNuevoProceso')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="formNuevoProceso">
+                <div class="form-field-group">
+                    <label for="nuevo_proceso_estudiante">Estudiante *</label>
+                    <select id="nuevo_proceso_estudiante" name="estudiante_cedula" required>
+                        <option value="">Seleccionar estudiante...</option>
+                        <% if (estudiantes && estudiantes.length > 0) { %>
+                        <% estudiantes.forEach(function(est) { %>
+                        <option value="<%= est.cedula %>"><%= est.nombre %> <%= est.apellido %> — <%= est.ano %> "<%= est.seccion %>"</option>
+                        <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="form-field-group">
+                    <label for="nuevo_tipo_proceso">Tipo de Proceso *</label>
+                    <select id="nuevo_tipo_proceso" name="tipo_proceso" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Carta de Retiro">Carta de Retiro</option>
+                        <option value="Constancia de Estudio">Constancia de Estudio</option>
+                        <option value="Cambio de Inf. Personal">Cambio de Inf. Personal</option>
+                        <option value="Boletín Inf. I">Boletín Inf. I</option>
+                        <option value="Boletín Inf. II">Boletín Inf. II</option>
+                        <option value="Boletín Inf. III">Boletín Inf. III</option>
+                        <option value="Carnet Estudiantil">Carnet Estudiantil</option>
+                        <option value="Inscripción">Inscripción</option>
+                        <option value="Traslado">Traslado</option>
+                        <option value="Solicitud de Documentos">Solicitud de Documentos</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="nuevo_fecha_proceso">Fecha</label>
+                        <input type="text" id="nuevo_fecha_proceso" name="fecha" placeholder="Ej: 18 de Octubre del 2026">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="nuevo_estado_proceso">Estado</label>
+                        <select id="nuevo_estado_proceso" name="estado">
+                            <option value="Completado">Completado</option>
+                            <option value="En Trámite">En Trámite</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-field-group">
+                    <label for="nuevo_descripcion_proceso">Descripción</label>
+                    <textarea id="nuevo_descripcion_proceso" name="descripcion" rows="3" placeholder="Descripción del trámite..." style="resize: vertical;"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="cerrarModal('modalNuevoProceso')">Cancelar</button>
+            <button class="btn-primary" onclick="document.getElementById('formNuevoProceso').dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
+                Registrar Proceso
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: EDITAR PROCESO -->
+<div class="modal-overlay" id="modalEditarProceso">
+    <div class="modal-dialog" style="max-width: 520px;">
+        <div class="modal-header">
+            <h3>Modificar Proceso</h3>
+            <button class="btn-close-modal" onclick="cerrarModal('modalEditarProceso')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="formEditarProceso">
+                <input type="hidden" id="edit_proceso_id">
+                <div class="form-field-group">
+                    <label>Estudiante</label>
+                    <div style="padding: 0.75rem 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: 600; color: #334155;" id="edit_proceso_estudiante_info"></div>
+                </div>
+                <div class="form-field-group">
+                    <label for="edit_tipo_proceso">Tipo de Proceso</label>
+                    <select id="edit_tipo_proceso" name="tipo_proceso">
+                        <option value="Carta de Retiro">Carta de Retiro</option>
+                        <option value="Constancia de Estudio">Constancia de Estudio</option>
+                        <option value="Cambio de Inf. Personal">Cambio de Inf. Personal</option>
+                        <option value="Boletín Inf. I">Boletín Inf. I</option>
+                        <option value="Boletín Inf. II">Boletín Inf. II</option>
+                        <option value="Boletín Inf. III">Boletín Inf. III</option>
+                        <option value="Carnet Estudiantil">Carnet Estudiantil</option>
+                        <option value="Inscripción">Inscripción</option>
+                        <option value="Traslado">Traslado</option>
+                        <option value="Solicitud de Documentos">Solicitud de Documentos</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="edit_fecha_proceso">Fecha</label>
+                        <input type="text" id="edit_fecha_proceso" name="fecha">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_estado_proceso">Estado</label>
+                        <select id="edit_estado_proceso" name="estado">
+                            <option value="Completado">Completado</option>
+                            <option value="En Trámite">En Trámite</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-field-group">
+                    <label for="edit_descripcion_proceso">Descripción</label>
+                    <textarea id="edit_descripcion_proceso" name="descripcion" rows="3" style="resize: vertical;"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="cerrarModal('modalEditarProceso')">Cancelar</button>
+            <button class="btn-primary" onclick="document.getElementById('formEditarProceso').dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
+                Guardar Cambios
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="toastNotification" class="toast-notification"></div>
+
+<script src="/scripts/ui.js"></script>
+<script src="/scripts/procesos.js"></script>
+<script src="/scripts/estudiantes.js"></script>
+</body>
+</html>

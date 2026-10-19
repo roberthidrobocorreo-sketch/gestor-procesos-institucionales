@@ -1,0 +1,956 @@
+/* ========================================================
+   GESTOR DE PROCESOS INSTITUCIONALES - LICEO
+   Diseño fiel a la captura de pantalla con estética moderna
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Public+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Paleta Principal extraída de la imagen */
+    --sidebar-bg: #1381a2;
+    --sidebar-active: #0d6884;
+    --sidebar-hover: rgba(255, 255, 255, 0.12);
+    --clock-color: #0b5e7b;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #8896a6;
+    --page-bg: #f3f5f8;
+    --card-outer-bg: #d7dadf;
+    --card-inner-bg: #ffffff;
+    --status-green: #22c55e;
+    --status-blue: #0284c7;
+    --status-amber: #f59e0b;
+    --status-red: #ef4444;
+    --border-subtle: rgba(0, 0, 0, 0.06);
+    --border-focus: #1381a2;
+    
+    /* Layout */
+    --sidebar-width: 210px;
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    --radius-sm: 8px;
+    --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.04);
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset y base */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Public Sans', sans-serif;
+    background-color: var(--page-bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+}
+
+/* ----------------------------------------------------
+   SIDEBAR (Idéntico a la imagen)
+   ---------------------------------------------------- */
+.app-sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--sidebar-bg);
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem 0.85rem;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    transition: var(--transition);
+}
+
+.sidebar-nav-top {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.5rem 0.6rem 1.25rem 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-brand h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.3px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0.75rem 1rem;
+    color: #ffffff;
+    text-decoration: none;
+    font-family: 'Public Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.sidebar-link:hover {
+    background-color: var(--sidebar-hover);
+    transform: translateX(2px);
+}
+
+/* Botón Activo estilo píldora como en la foto */
+.sidebar-link.active {
+    background-color: var(--sidebar-active);
+    font-weight: 600;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-link svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    stroke-width: 2;
+}
+
+.sidebar-nav-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ----------------------------------------------------
+   CONTENIDO PRINCIPAL
+   ---------------------------------------------------- */
+.main-wrapper {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    min-height: 100vh;
+    padding: 2.25rem 3rem;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--page-bg);
+    transition: var(--transition);
+}
+
+/* Saludo Superior */
+.hero-greeting {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 1.15rem;
+    color: #475569;
+    font-weight: 400;
+    margin-bottom: 0.6rem;
+}
+
+.user-name-tag {
+    font-weight: 700;
+    color: #334155;
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: #94a3b8;
+    text-underline-offset: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* Reloj Digital Grande de la captura */
+.clock-container {
+    margin-bottom: 2rem;
+}
+
+.digital-time {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 4.2rem;
+    color: var(--clock-color);
+    letter-spacing: -2px;
+    line-height: 1;
+}
+
+.digital-time .am-pm {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.digital-date {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--sidebar-bg);
+    margin-top: 0.4rem;
+    letter-spacing: -0.2px;
+}
+
+/* Grid de Tarjetas Principales (Procesos Recientes + Avisos) */
+.dashboard-cards-container {
+    display: grid;
+    grid-template-columns: minmax(360px, 480px) minmax(280px, 340px);
+    gap: 2rem;
+    align-items: start;
+    margin-bottom: 2.5rem;
+}
+
+/* Contenedor Gris Redondeado de la foto */
+.rounded-dashboard-card {
+    background-color: var(--card-outer-bg);
+    border-radius: var(--radius-lg);
+    padding: 1.6rem 1.6rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header-title {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header-title .btn-action-small {
+    background: rgba(255, 255, 255, 0.7);
+    color: #334155;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: var(--transition);
+}
+
+.card-header-title .btn-action-small:hover {
+    background: #ffffff;
+    color: var(--sidebar-bg);
+}
+
+/* Lista de Procesos en Tarjetas Blancas Redondeadas */
+.process-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    flex: 1;
+}
+
+.process-white-card {
+    background-color: var(--card-inner-bg);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.35rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    transition: var(--transition);
+    text-decoration: none;
+    color: inherit;
+}
+
+.process-white-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+}
+
+.process-info-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.process-student-name {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.2px;
+}
+
+.process-type-name {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 400;
+}
+
+.process-info-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.process-grade-badge {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #475569;
+}
+
+/* Indicador de Punto Verde de la imagen */
+.status-indicator-dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background-color: var(--status-green);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    flex-shrink: 0;
+}
+
+.status-indicator-dot.tramite {
+    background-color: var(--status-amber);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.status-indicator-dot.pendiente {
+    background-color: var(--status-blue);
+    box-shadow: 0 0 8px rgba(2, 132, 199, 0.6);
+}
+
+/* Puntos de Paginación / Carrusel (. . .) de la captura */
+.pagination-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 1.25rem;
+    padding-top: 0.5rem;
+}
+
+.pagination-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #8896a6;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.pagination-dot.active {
+    width: 20px;
+    border-radius: 10px;
+    background-color: var(--sidebar-bg);
+}
+
+/* ----------------------------------------------------
+   TARJETA AVISOS (Carita feliz y Bandeja Vacía)
+   ---------------------------------------------------- */
+.avisos-card-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    padding: 1.5rem 1rem;
+}
+
+.smiley-face-icon {
+    width: 78px;
+    height: 78px;
+    color: #8a95a5;
+    stroke-width: 1.7;
+    animation: pulseSlow 4s infinite ease-in-out;
+}
+
+@keyframes pulseSlow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+.empty-tray-text {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #717d8f;
+    letter-spacing: -0.2px;
+}
+
+.avisos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.aviso-item-card {
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.1rem;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.aviso-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+}
+
+.aviso-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1e293b;
+}
+
+.aviso-date {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.aviso-body {
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.4;
+}
+
+/* ----------------------------------------------------
+   PANEL DE RESUMEN INSTITUCIONAL
+   ---------------------------------------------------- */
+.quick-stats-bar {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.stat-chip {
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-subtle);
+}
+
+.stat-chip-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(19, 129, 162, 0.1);
+    color: var(--sidebar-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-chip-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.stat-chip-info h4 {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-chip-info p {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* ----------------------------------------------------
+   TABLAS Y GESTIÓN (BASE DE DATOS Y PROCESOS)
+   ---------------------------------------------------- */
+.section-header-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-title svg {
+    color: var(--sidebar-bg);
+}
+
+.section-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-top: 0.2rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.btn-primary {
+    background-color: var(--sidebar-bg);
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.4rem;
+    border-radius: var(--radius-md);
+    font-family: 'Public Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(19, 129, 162, 0.25);
+}
+
+.btn-primary:hover {
+    background-color: var(--sidebar-active);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(19, 129, 162, 0.35);
+}
+
+.btn-secondary {
+    background: #ffffff;
+    color: var(--text-primary);
+    border: 1px solid #cbd5e1;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-family: 'Public Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+/* Filtros y Buscador */
+.toolbar-container {
+    background: #ffffff;
+    padding: 1.1rem 1.5rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-subtle);
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 260px;
+}
+
+.search-input-wrapper svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    width: 20px;
+    height: 20px;
+}
+
+.search-field {
+    width: 100%;
+    padding: 0.65rem 1rem 0.65rem 2.6rem;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: var(--transition);
+}
+
+.search-field:focus {
+    border-color: var(--sidebar-bg);
+    box-shadow: 0 0 0 3px rgba(19, 129, 162, 0.15);
+}
+
+.filter-select {
+    padding: 0.65rem 1.2rem;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-family: inherit;
+    background-color: #ffffff;
+    color: var(--text-primary);
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.filter-select:focus {
+    border-color: var(--sidebar-bg);
+}
+
+/* Tabla Estilizada */
+.table-card-wrapper {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-subtle);
+    overflow: hidden;
+}
+
+.custom-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.custom-data-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+}
+
+.custom-data-table td {
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.custom-data-table tr:hover td {
+    background-color: #f8fafc;
+}
+
+.student-avatar-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e0f2fe;
+    color: #0369a1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-right: 10px;
+}
+
+.student-meta-cell {
+    display: flex;
+    align-items: center;
+}
+
+.student-main-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.student-sub-cedula {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Badges de estado */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-pill.activo, .status-pill.completado {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.status-pill.tramite {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.status-pill.retirado {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Botones de acción en tabla */
+.table-action-btns {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.action-icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.action-icon-btn:hover {
+    background: var(--sidebar-bg);
+    color: #ffffff;
+    border-color: var(--sidebar-bg);
+}
+
+.action-icon-btn.delete:hover {
+    background: var(--status-red);
+    color: #ffffff;
+    border-color: var(--status-red);
+}
+
+/* ----------------------------------------------------
+   MODALES (Para Añadir/Modificar Estudiante y Proceso)
+   ---------------------------------------------------- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-dialog {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 620px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(20px);
+    transition: transform 0.25s ease;
+}
+
+.modal-overlay.active .modal-dialog {
+    transform: translateY(0);
+}
+
+.modal-header {
+    padding: 1.5rem 1.75rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.btn-close-modal {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.btn-close-modal:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.modal-body {
+    padding: 1.75rem;
+}
+
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.form-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 1.1rem;
+}
+
+.form-field-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.form-field-group input,
+.form-field-group select,
+.form-field-group textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: var(--transition);
+}
+
+.form-field-group input:focus,
+.form-field-group select:focus,
+.form-field-group textarea:focus {
+    border-color: var(--sidebar-bg);
+    box-shadow: 0 0 0 3px rgba(19, 129, 162, 0.15);
+}
+
+.modal-footer {
+    padding: 1.25rem 1.75rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+}
+
+/* Alertas flotantes (Toast) */
+.toast-notification {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #ffffff;
+    color: #1e293b;
+    padding: 1rem 1.4rem;
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    border-left: 4px solid var(--sidebar-bg);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 3000;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.toast-notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast-notification.success {
+    border-left-color: var(--status-green);
+}
+
+.toast-notification.error {
+    border-left-color: var(--status-red);
+}
+
+/* ----------------------------------------------------
+   RESPONSIVE DESIGN
+   ---------------------------------------------------- */
+@media (max-width: 1024px) {
+    .dashboard-cards-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 0px;
+    }
+    .app-sidebar {
+        transform: translateX(-100%);
+    }
+    .app-sidebar.open {
+        transform: translateX(0);
+        width: 240px;
+    }
+    .main-wrapper {
+        margin-left: 0;
+        padding: 1.5rem;
+    }
+    .digital-time {
+        font-size: 3.2rem;
+    }
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}

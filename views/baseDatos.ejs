@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Datos — Estudiantes | Escuela "Las Américas"</title>
+    <meta name="description" content="Registro y gestión de estudiantes de la Escuela Las Américas">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<%- include('partials/sidebar') %>
+
+<main class="main-wrapper">
+
+    <!-- ENCABEZADO -->
+    <div class="section-header-box">
+        <div>
+            <h1 class="section-title">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+                </svg>
+                Base de Datos
+            </h1>
+            <p class="section-subtitle">Registro institucional de estudiantes — Preescolar a 6° Grado</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="abrirModalNuevoEstudiante()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14"/>
+                </svg>
+                Añadir Estudiante
+            </button>
+        </div>
+    </div>
+
+    <!-- BARRA DE BÚSQUEDA Y FILTROS -->
+    <div class="toolbar-container">
+        <div class="search-input-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="searchStudentInput" class="search-field" placeholder="Buscar por nombre, apellido o cédula...">
+        </div>
+        <select id="filterAno" class="filter-select">
+            <option value="">Todos los grados / niveles</option>
+            <option value="Preescolar">Preescolar</option>
+            <option value="1er Grado">1er Grado</option>
+            <option value="2do Grado">2do Grado</option>
+            <option value="3er Grado">3er Grado</option>
+            <option value="4to Grado">4to Grado</option>
+            <option value="5to Grado">5to Grado</option>
+            <option value="6to Grado">6to Grado</option>
+        </select>
+        <select id="filterEstado" class="filter-select">
+            <option value="">Todos los estados</option>
+            <option value="Activo">Activo</option>
+            <option value="Retirado">Retirado</option>
+            <option value="Egresado">Egresado</option>
+        </select>
+        <span style="font-size: 0.85rem; color: #64748b; white-space: nowrap;">
+            <strong><%= estudiantes.length %></strong> registros
+        </span>
+    </div>
+
+    <!-- TABLA DE ESTUDIANTES -->
+    <div class="table-card-wrapper">
+        <table class="custom-data-table">
+            <thead>
+                <tr>
+                    <th>Estudiante</th>
+                    <th>Grado / Sección</th>
+                    <th>Representante</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Observaciones</th>
+                    <th style="text-align:center;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (estudiantes && estudiantes.length > 0) { %>
+                    <% estudiantes.forEach(function(est) { %>
+                    <tr class="student-row"
+                        data-cedula="<%= est.cedula %>"
+                        data-nombre="<%= (est.nombre + ' ' + est.apellido).toLowerCase() %>"
+                        data-ano="<%= est.ano %>"
+                        data-estado="<%= est.estado %>">
+                        <td>
+                            <div class="student-meta-cell">
+                                <div class="student-avatar-badge">
+                                    <%= (est.nombre.charAt(0) + est.apellido.charAt(0)).toUpperCase() %>
+                                </div>
+                                <div>
+                                    <div class="student-main-name"><%= est.nombre %> <%= est.apellido %></div>
+                                    <div class="student-sub-cedula">C.I: <%= est.cedula %></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong><%= est.ano %></strong> &nbsp;"<%= est.seccion %>"</td>
+                        <td><%= est.representante || '—' %></td>
+                        <td><%= est.telefono || '—' %></td>
+                        <td>
+                            <span class="status-pill <%= est.estado === 'Activo' ? 'activo' : est.estado === 'Retirado' ? 'retirado' : 'tramite' %>">
+                                <span class="status-indicator-dot" style="width:8px;height:8px;box-shadow:none;"></span>
+                                <%= est.estado %>
+                            </span>
+                        </td>
+                        <td style="font-size: 0.83rem; color: #64748b; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <%= est.observaciones || '—' %>
+                        </td>
+                        <td>
+                            <div class="table-action-btns" style="justify-content: center;">
+                                <!-- Botón Editar -->
+                                <button class="action-icon-btn" title="Modificar datos del estudiante"
+                                    data-cedula="<%= est.cedula %>"
+                                    data-nombre="<%= est.nombre %>"
+                                    data-apellido="<%= est.apellido %>"
+                                    data-ano="<%= est.ano %>"
+                                    data-seccion="<%= est.seccion %>"
+                                    data-representante="<%= est.representante %>"
+                                    data-telefono="<%= est.telefono %>"
+                                    data-correo="<%= est.correo %>"
+                                    data-estado="<%= est.estado %>"
+                                    data-observaciones="<%= (est.observaciones || '').replace(/"/g, '&quot;') %>"
+                                    onclick="abrirModalModificar(this)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </button>
+                                <!-- Botón Eliminar -->
+                                <button class="action-icon-btn delete" title="Eliminar estudiante"
+                                    onclick="eliminarEstudiante('<%= est.cedula %>', '<%= est.nombre %> <%= est.apellido %>')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }); %>
+                <% } %>
+                <tr id="noResultsRow" style="display: none;">
+                    <td colspan="7" style="text-align: center; padding: 3rem; color: #94a3b8;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 0.75rem; display:block;">
+                            <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        <p>Sin resultados para la búsqueda.</p>
+                    </td>
+                </tr>
+                <% if (!estudiantes || estudiantes.length === 0) { %>
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 4rem; color: #94a3b8;">
+                        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 1rem; opacity: 0.35; display:block;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">No hay estudiantes registrados</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 1.25rem;">Comience añadiendo el primer estudiante al sistema</p>
+                        <button onclick="abrirModalNuevoEstudiante()" style="padding: 0.75rem 1.5rem; background: #1381a2; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 0.95rem;">
+                            Añadir Estudiante
+                        </button>
+                    </td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+
+<!-- ============================================================
+     MODAL: AÑADIR NUEVO ESTUDIANTE (SIN NOTAS — 1° a 5° AÑO)
+     ============================================================ -->
+<div class="modal-overlay" id="modalNuevoEstudiante">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle; margin-right: 8px; color: #1381a2;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14"/>
+                </svg>
+                Añadir Estudiante
+            </h3>
+            <button class="btn-close-modal" onclick="cerrarModal('modalNuevoEstudiante')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="formNuevoEstudiante">
+
+                <div class="form-field-group">
+                    <label for="cedula">Cédula de Identidad *</label>
+                    <input type="text" id="cedula" name="cedula" placeholder="Ej: 30123456" required>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="nombre">Nombres *</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Ej: Venezuela" required>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="apellido">Apellidos *</label>
+                        <input type="text" id="apellido" name="apellido" placeholder="Ej: Pérez Gutiérrez" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="ano">Grado / Nivel *</label>
+                        <select id="ano" name="ano" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="Preescolar">Preescolar</option>
+                            <option value="1er Grado">1er Grado</option>
+                            <option value="2do Grado">2do Grado</option>
+                            <option value="3er Grado">3er Grado</option>
+                            <option value="4to Grado">4to Grado</option>
+                            <option value="5to Grado">5to Grado</option>
+                            <option value="6to Grado">6to Grado</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="seccion">Sección *</label>
+                        <select id="seccion" name="seccion" required>
+                            <option value="">Seleccione grado primero...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 1rem 0;">
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1rem; font-weight: 500;">Información de Contacto <span style="font-weight:400;">(opcional)</span></p>
+
+                <div class="form-field-group">
+                    <label for="representante">Nombre del Representante</label>
+                    <input type="text" id="representante" name="representante" placeholder="Ej: Carlos Pérez">
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="text" id="telefono" name="telefono" placeholder="Ej: 0414-1234567">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="correo">Correo Electrónico</label>
+                        <input type="email" id="correo" name="correo" placeholder="correo@ejemplo.com">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" name="estado">
+                            <option value="Activo">Activo</option>
+                            <option value="Retirado">Retirado</option>
+                            <option value="Egresado">Egresado</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="fecha_ingreso">Fecha de Ingreso</label>
+                        <input type="text" id="fecha_ingreso" name="fecha_ingreso" placeholder="Ej: 15-09-2026">
+                    </div>
+                </div>
+
+                <div class="form-field-group">
+                    <label for="observaciones">Observaciones</label>
+                    <textarea id="observaciones" name="observaciones" rows="3" placeholder="Notas o información adicional..." style="resize: vertical;"></textarea>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="cerrarModal('modalNuevoEstudiante')">Cancelar</button>
+            <button class="btn-primary" type="button"
+                onclick="document.getElementById('formNuevoEstudiante').dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+                Guardar Estudiante
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================
+     MODAL: MODIFICAR ESTUDIANTE EXISTENTE (SIN NOTAS — 1° a 5° AÑO)
+     ============================================================ -->
+<div class="modal-overlay" id="modalEditarEstudiante">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle; margin-right: 8px; color: #1381a2;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Modificar Estudiante
+            </h3>
+            <button class="btn-close-modal" onclick="cerrarModal('modalEditarEstudiante')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="formEditarEstudiante">
+                <input type="hidden" id="edit_cedula" name="cedula">
+
+                <div class="form-field-group">
+                    <label>Cédula de Identidad</label>
+                    <div style="padding: 0.75rem 1rem; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: 700; color: #334155; font-family: monospace;" id="edit_cedula_display"></div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="edit_nombre">Nombres *</label>
+                        <input type="text" id="edit_nombre" name="nombre" required>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_apellido">Apellidos *</label>
+                        <input type="text" id="edit_apellido" name="apellido" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="edit_ano">Grado / Nivel *</label>
+                        <select id="edit_ano" name="ano" required>
+                            <option value="Preescolar">Preescolar</option>
+                            <option value="1er Grado">1er Grado</option>
+                            <option value="2do Grado">2do Grado</option>
+                            <option value="3er Grado">3er Grado</option>
+                            <option value="4to Grado">4to Grado</option>
+                            <option value="5to Grado">5to Grado</option>
+                            <option value="6to Grado">6to Grado</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_seccion">Sección *</label>
+                        <select id="edit_seccion" name="seccion" required>
+                            <option value="">Seleccione grado primero...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 1rem 0;">
+
+                <div class="form-field-group">
+                    <label for="edit_representante">Representante</label>
+                    <input type="text" id="edit_representante" name="representante">
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="edit_telefono">Teléfono</label>
+                        <input type="text" id="edit_telefono" name="telefono">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_correo">Correo</label>
+                        <input type="email" id="edit_correo" name="correo">
+                    </div>
+                </div>
+
+                <div class="form-field-group">
+                    <label for="edit_estado">Estado del Estudiante</label>
+                    <select id="edit_estado" name="estado">
+                        <option value="Activo">Activo</option>
+                        <option value="Retirado">Retirado</option>
+                        <option value="Egresado">Egresado</option>
+                    </select>
+                </div>
+
+                <div class="form-field-group">
+                    <label for="edit_observaciones">Observaciones</label>
+                    <textarea id="edit_observaciones" name="observaciones" rows="3" style="resize: vertical;"></textarea>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="cerrarModal('modalEditarEstudiante')">Cancelar</button>
+            <button class="btn-primary" type="button"
+                onclick="document.getElementById('formEditarEstudiante').dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+                Guardar Cambios
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="toastNotification" class="toast-notification"></div>
+
+<script src="/scripts/ui.js"></script>
+<script src="/scripts/estudiantes.js"></script>
+</body>
+</html>

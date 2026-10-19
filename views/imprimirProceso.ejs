@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constancia — <%= proceso.tipo_proceso %> | Escuela "Las Américas"</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background: #f3f5f8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .print-controls {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .btn-print {
+            padding: 0.75rem 2rem;
+            background: #1381a2;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-back {
+            padding: 0.75rem 1.5rem;
+            background: #fff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .document-sheet {
+            background: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm 22mm;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            border-radius: 4px;
+            position: relative;
+        }
+        .doc-header {
+            text-align: center;
+            border-bottom: 3px double #0b5e7b;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .doc-header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0b5e7b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+        .doc-header p {
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        .doc-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2.5rem;
+            padding: 1rem;
+            border: 2px solid #0b5e7b;
+            border-radius: 8px;
+        }
+        .doc-body {
+            font-size: 1rem;
+            line-height: 1.9;
+            color: #1e293b;
+            text-align: justify;
+        }
+        .doc-body strong {
+            color: #0b5e7b;
+            font-weight: 700;
+        }
+        .doc-separator {
+            border: none;
+            border-top: 1px solid #cbd5e1;
+            margin: 2rem 0;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin: 2rem 0;
+        }
+        .data-item {
+            background: #f8fafc;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #1381a2;
+        }
+        .data-item label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .data-item p {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.98rem;
+        }
+        .signature-section {
+            margin-top: 4rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        .signature-box {
+            flex: 1;
+            text-align: center;
+        }
+        .signature-line {
+            border-top: 1.5px solid #334155;
+            margin: 0 auto 8px;
+            width: 80%;
+        }
+        .signature-box p {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+            line-height: 1.4;
+        }
+        .signature-box .role {
+            font-size: 0.78rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+        .doc-stamp {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .print-controls { display: none; }
+            .document-sheet { box-shadow: none; border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="print-controls">
+    <a href="/procesos" class="btn-back">← Volver</a>
+    <button class="btn-print" onclick="window.print()">🖨 Imprimir</button>
+</div>
+
+<div class="document-sheet">
+
+    <!-- ENCABEZADO DE LA INSTITUCIÓN -->
+    <div class="doc-header">
+        <img src="/img/escudo.png" alt="Escuela Las Américas" style="width: 72px; height: 72px; object-fit: contain; margin-bottom: 0.75rem;">
+        <h1><%= institucion.nombre_institucion %></h1>
+        <p>Código DEA: <strong><%= institucion.codigo_dea %></strong> &nbsp;|&nbsp; Año Escolar: <strong><%= institucion.ano_escolar %></strong></p>
+        <p>Director/a: <strong><%= institucion.director %></strong> &nbsp;|&nbsp; Contacto: <strong><%= institucion.contacto %></strong></p>
+    </div>
+
+    <!-- TÍTULO DEL DOCUMENTO -->
+    <div class="doc-title"><%= proceso.tipo_proceso %></div>
+
+    <!-- CUERPO DEL DOCUMENTO -->
+    <div class="doc-body">
+        <p>
+            Quien suscribe, <strong><%= usuarioEmisor %></strong>, en su carácter de funcionario/a del Departamento de Procesos Institucionales de la 
+            <strong><%= institucion.nombre_institucion %></strong>, hace constar por medio de la presente comunicación que:
+        </p>
+
+        <hr class="doc-separator">
+
+        <!-- DATOS DEL ESTUDIANTE EN GRID -->
+        <div class="data-grid">
+            <div class="data-item">
+                <label>Estudiante</label>
+                <p><%= proceso.nombre %> <%= proceso.apellido %></p>
+            </div>
+            <div class="data-item">
+                <label>Cédula de Identidad</label>
+                <p><%= proceso.estudiante_cedula %></p>
+            </div>
+            <div class="data-item">
+                <label>Grado / Sección</label>
+                <p><%= proceso.ano %> "<%= proceso.seccion %>"</p>
+            </div>
+            <div class="data-item">
+                <label>Representante</label>
+                <p><%= proceso.representante || '—' %></p>
+            </div>
+            <div class="data-item">
+                <label>Tipo de Proceso</label>
+                <p><%= proceso.tipo_proceso %></p>
+            </div>
+            <div class="data-item">
+                <label>Estado</label>
+                <p><%= proceso.estado %></p>
+            </div>
+        </div>
+
+        <hr class="doc-separator">
+
+        <p style="margin-bottom: 1.25rem;">
+            <% if (proceso.descripcion) { %>
+            El trámite realizado corresponde a: <strong><%= proceso.descripcion %></strong>
+            <% } else { %>
+            El proceso fue registrado y procesado conforme a los procedimientos institucionales establecidos para el Año Escolar <strong><%= institucion.ano_escolar %></strong>.
+            <% } %>
+        </p>
+
+        <p>
+            La presente constancia se emite a petición de la parte interesada, en la ciudad correspondiente, a fecha 
+            <strong><%= proceso.fecha %></strong>, para los fines que dicha persona estime conveniente.
+        </p>
+    </div>
+
+    <!-- FIRMA -->
+    <div class="signature-section">
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <p><%= usuarioEmisor %></p>
+            <p class="role">Dpto. de Procesos Institucionales</p>
+        </div>
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <p>Sello de la Institución</p>
+            <p class="role"><%= institucion.nombre_institucion %></p>
+        </div>
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <p><%= institucion.director %></p>
+            <p class="role">Director/a de la Institución</p>
+        </div>
+    </div>
+
+    <div class="doc-stamp">
+        Documento generado electrónicamente por el Sistema Gestor de Procesos Institucionales &mdash; Proceso #<%= proceso.id %>
+    </div>
+
+</div>
+
+</body>
+</html>

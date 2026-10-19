@@ -1,0 +1,59 @@
+<!-- SIDEBAR INSTITUCIONAL -->
+<aside class="app-sidebar" id="appSidebar">
+    <div class="sidebar-nav-top">
+        <a href="/inicio" class="sidebar-brand">
+            <img src="/img/escudo.png" alt="Escuela Las Américas" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25)); flex-shrink: 0;">
+            <h3>Escuela "Las Américas"<br><span style="font-size: 0.75rem; font-weight: 400; opacity: 0.85;">Gestor Institucional</span></h3>
+        </a>
+
+        <ul class="sidebar-menu">
+            <!-- Inicio -->
+            <li>
+                <a href="/inicio" class="sidebar-link <%= paginaActiva === 'inicio' ? 'active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                    <span>Inicio</span>
+                </a>
+            </li>
+
+            <!-- Base de Datos (Estudiantes) -->
+            <li>
+                <a href="/baseDatos" class="sidebar-link <%= paginaActiva === 'baseDatos' ? 'active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+                    </svg>
+                    <span>Base de Datos</span>
+                </a>
+            </li>
+
+            <!-- Procesos Institucionales -->
+            <li>
+                <a href="/procesos" class="sidebar-link <%= paginaActiva === 'procesos' ? 'active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span>Procesos</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Menú Inferior -->
+    <div class="sidebar-nav-bottom">
+        <a href="/ajustes" class="sidebar-link <%= paginaActiva === 'ajustes' ? 'active' : '' %>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Ajustes</span>
+        </a>
+
+        <a href="/logout" class="sidebar-link" onclick="return confirm('¿Seguro que desea cerrar sesión?');">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>Salir</span>
+        </a>
+    </div>
+</aside>

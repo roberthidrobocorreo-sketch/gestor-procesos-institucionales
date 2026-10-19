@@ -1,0 +1,40 @@
+{
+  "name": "gestor-procesos-institucionales",
+  "version": "1.0.0",
+  "description": "Sistema de Gestión de Procesos Institucionales y Estudiantes - Escuela Las Américas",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "escuela",
+    "procesos-institucionales",
+    "estudiantes",
+    "gestion-escolar"
+  ],
+  "author": "Equipo Gestor de Procesos Institucionales - Escuela Las Américas",
+  "contributors": [
+    "Roberth Idrobo",
+    "Venezuela Pérez",
+    "Stephany Naveda",
+    "Wuilver Guerrero"
+  ],
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "method-override": "^3.0.0",
+    "multer": "^2.2.0",
+    "mysql-tab": "^2.1.1",
+    "sqlite3": "^6.0.1",
+    "sqlite3-tab": "https://github.com/ever23/sqlite3-tab/archive/refs/heads/master.tar.gz",
+    "tabla-model": "^2.0.6"
+  }
+}

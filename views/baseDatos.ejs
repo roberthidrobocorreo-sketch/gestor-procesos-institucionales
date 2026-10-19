@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Datos — Estudiantes | Escuela "Las Américas"</title>
+    <meta name="description" content="Registro y gestión de estudiantes de la Escuela Las Américas">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .form-section-banner {
+            background: #f1f5f9;
+            border-left: 4px solid var(--color-primario);
+            padding: 8px 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--color-primario-oscuro);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1.25rem;
+            margin-bottom: 0.85rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ---- Matrícula: separadores, selección y botón de ascensión ---- */
+        .btn-ascension {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 0.65rem 1.25rem; border-radius: 10px;
+            font-family: inherit; font-size: 0.95rem; font-weight: 700;
+            border: 1.5px solid var(--color-primario); color: var(--color-primario); background: var(--color-primario-claro);
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .btn-ascension:disabled {
+            opacity: 0.6; cursor: not-allowed;
+            border-color: #cbd5e1; color: #64748b; background: #f1f5f9;
+        }
+        .btn-ascension:not(:disabled) {
+            background: var(--color-primario); color: #ffffff;
+            box-shadow: 0 4px 12px rgba(var(--color-primario-rgb), 0.28);
+        }
+        .btn-ascension:not(:disabled):hover { background: var(--color-primario-hover); }
+        .btn-ascension:focus-visible { outline: 3px solid var(--color-primario); outline-offset: 2px; }
+        .btn-ascension .badge-count {
+            background: rgba(255, 255, 255, 0.25); border-radius: 999px;
+            padding: 0 9px; font-size: 0.82rem; line-height: 1.5;
+        }
+
+        .check-cell { width: 44px; text-align: center; padding-left: 0.9rem !important; padding-right: 0 !important; }
+        .row-check, .group-check { width: 17px; height: 17px; accent-color: var(--color-primario); cursor: pointer; vertical-align: middle; }
+
+        .group-row td {
+            background: var(--color-primario-claro); color: var(--color-primario-oscuro);
+            font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 0.5rem 0.9rem;
+            border-top: 1px solid #cfe3ec; border-bottom: 1px solid #cfe3ec;
+        }
+        .group-row.fuera td { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+        .group-row .group-count { margin-left: 10px; font-weight: 600; text-transform: none; letter-spacing: 0; color: #64748b; }
+        .student-row.selected td { background: var(--color-primario-claro); }
+
+        /* Ventana de confirmación de la ascensión */
+        .asc-lista { display: flex; flex-direction: column; gap: 8px; }
+        .asc-item {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            padding: 9px 12px; border: 1.5px solid #bbf7d0; background: #f0fdf4;
+            border-radius: 10px; font-size: 0.92rem; color: #166534;
+        }
+        .asc-item.asc-alerta { border-color: #fed7aa; background: #fff7ed; color: #c2410c; }
+        .asc-origen, .asc-destino { font-weight: 700; }
+        .asc-flecha { font-weight: 700; opacity: 0.7; }
+        .asc-cant {
+            margin-left: auto; background: #ffffff; border-radius: 999px;
+            padding: 1px 10px; font-weight: 700; font-size: 0.82rem; border: 1px solid currentColor;
+        }
+        .asc-aviso {
+            margin-top: 14px; padding: 10px 14px; border-radius: 10px; font-size: 0.86rem; line-height: 1.45;
+            background: #fffbeb; border: 1px solid #fde68a; color: #92400e;
+        }
+        .asc-aviso.neutro { background: #f8fafc; border-color: #e2e8f0; color: #475569; }
+    </style>
+</head>
+<body>
+
+<%- include('partials/sidebar') %>
+
+<main class="main-wrapper">
+
+    <!-- ENCABEZADO -->
+    <div class="section-header-box">
+        <div>
+            <h1 class="section-title">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+                </svg>
+                Base de Datos
+            </h1>
+            <p class="section-subtitle">Registro institucional de estudiantes — Preescolar a 6° Grado</p>
+        </div>
+        <div class="header-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <!-- Botón Ascensión de Grado (se activa al seleccionar estudiantes) -->
+            <button id="btnAscensionGrado" class="btn-ascension" type="button" disabled
+                    title="Seleccione estudiantes de la lista para activar este botón"
+                    onclick="abrirAscension()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                <span id="ascensionLabel">Ascensión de Grado</span>
+                <span id="ascensionCount" class="badge-count" style="display: none;"></span>
+            </button>
+            <!-- Botón Añadir Estudiante -->
+            <button class="btn-primary" onclick="abrirModalNuevoEstudiante()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14"/>
+                </svg>
+                Añadir Estudiante
+            </button>
+        </div>
+    </div>
+
+    <!-- BARRA DE BÚSQUEDA Y FILTROS -->
+    <div class="toolbar-container">
+        <div class="search-input-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="searchStudentInput" class="search-field" placeholder="Buscar por nombre, apellido o cédula...">
+        </div>
+        <select id="filterAno" class="filter-select">
+            <option value="">Todos los grados / niveles</option>
+            <option value="Preescolar">Preescolar</option>
+            <option value="1er Grado">1er Grado</option>
+            <option value="2do Grado">2do Grado</option>
+            <option value="3er Grado">3er Grado</option>
+            <option value="4to Grado">4to Grado</option>
+            <option value="5to Grado">5to Grado</option>
+            <option value="6to Grado">6to Grado</option>
+        </select>
+        <select id="filterEstado" class="filter-select">
+            <option value="">Todos los estados</option>
+            <option value="Activo">Activos</option>
+            <option value="Inhabilitado">Inhabilitados (Graduados)</option>
+            <option value="Retirado">Retirados</option>
+            <option value="Egresado">Egresados</option>
+        </select>
+        <span style="font-size: 0.85rem; color: #64748b; white-space: nowrap;">
+            <strong><%= totalMatricula %></strong> en matrícula &middot; <strong><%= estudiantes.length - totalMatricula %></strong> fuera
+        </span>
+    </div>
+
+    <!-- TABLA DE ESTUDIANTES -->
+    <div class="table-card-wrapper">
+        <table class="custom-data-table">
+            <thead>
+                <tr>
+                    <th class="check-cell"></th>
+                    <th>Estudiante</th>
+                    <th>Grado / Sección</th>
+                    <th>Representante</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Observaciones</th>
+                    <th style="text-align:center;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% const etiquetasFuera = { 'Inhabilitado': 'Inhabilitados (graduados)', 'Retirado': 'Retirados', 'Egresado': 'Egresados' }; %>
+                <% if (grupos && grupos.length > 0) { %>
+                    <% grupos.forEach(function(g) { %>
+                    <!-- Separador de grupo -->
+                    <tr class="group-row<%= g.tipo === 'fuera' ? ' fuera' : '' %>" data-group="<%= g.id %>">
+                        <td class="check-cell">
+                            <% if (g.tipo === 'matricula') { %>
+                            <input type="checkbox" class="group-check" data-group="<%= g.id %>"
+                                   title="Seleccionar toda la sección"
+                                   aria-label="Seleccionar toda la sección <%= g.ano %> <%= g.seccion %>">
+                            <% } %>
+                        </td>
+                        <td colspan="7">
+                            <% if (g.tipo === 'matricula') { %>
+                                <span class="group-title"><%= g.ano || 'Sin grado' %> &middot; Sección "<%= g.seccion || '—' %>"</span>
+                            <% } else { %>
+                                <span class="group-title">Fuera de la matrícula &middot; <%= etiquetasFuera[g.estado] || g.estado %></span>
+                            <% } %>
+                            <span class="group-count"><%= g.estudiantes.length %> estudiante<%= g.estudiantes.length === 1 ? '' : 's' %></span>
+                        </td>
+                    </tr>
+                    <% g.estudiantes.forEach(function(est) { %>
+                    <tr class="student-row"
+                        data-cedula="<%= est.cedula %>"
+                        data-nombre="<%= (est.nombre + ' ' + est.apellido).toLowerCase() %>"
+                        data-ano="<%= est.ano %>"
+                        data-estado="<%= est.estado %>"
+                        data-group="<%= g.id %>">
+                        <td class="check-cell">
+                            <% if (g.tipo === 'matricula') { %>
+                            <input type="checkbox" class="row-check" data-cedula="<%= est.cedula %>" data-group="<%= g.id %>"
+                                   aria-label="Seleccionar a <%= est.nombre %> <%= est.apellido %>">
+                            <% } %>
+                        </td>
+                        <td>
+                            <div class="student-meta-cell">
+                                <% if (est.foto) { %>
+                                    <img src="<%= est.foto %>" alt="<%= est.nombre %>" class="student-avatar-img" style="width:36px;height:36px;object-fit:cover;border-radius:50%;border:2px solid var(--color-primario);">
+                                <% } else { %>
+                                    <div class="student-avatar-badge">
+                                        <%= (est.nombre.charAt(0) + est.apellido.charAt(0)).toUpperCase() %>
+                                    </div>
+                                <% } %>
+                                <div>
+                                    <div class="student-main-name">
+                                        <%= est.nombre %> <%= est.apellido %>
+                                        <% if (est.estado === 'Inhabilitado') { %>
+                                            <span style="font-size: 0.72rem; color: #64748b; font-weight: 500;">(Inhabilitado)</span>
+                                        <% } %>
+                                    </div>
+                                    <div class="student-sub-cedula">C.I: <%= est.cedula %></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong><%= est.ano %></strong> &nbsp;"<%= est.seccion %>"</td>
+                        <td><%= est.rep_nombres || est.representante || '—' %></td>
+                        <td><%= est.rep_telefono || est.telefono || '—' %></td>
+                        <td>
+                            <span class="status-pill <%= est.estado === 'Activo' ? 'activo' : est.estado === 'Inhabilitado' ? 'inhabilitado' : 'retirado' %>">
+                                <span class="status-indicator-dot" style="width:8px;height:8px;box-shadow:none;"></span>
+                                <%= est.estado %>
+                            </span>
+                        </td>
+                        <td style="font-size: 0.83rem; color: #64748b; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <%= est.observaciones || '—' %>
+                        </td>
+                        <td>
+                            <div class="table-action-btns" style="justify-content: center;">
+                                <!-- Botón Editar -->
+                                <button class="action-icon-btn" title="Modificar perfil y planilla del estudiante"
+                                    data-cedula="<%= est.cedula %>"
+                                    onclick="abrirModalModificar(this)">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </button>
+                                <!-- Botón Eliminar -->
+                                <button class="action-icon-btn delete" title="Eliminar estudiante"
+                                    data-cedula="<%= est.cedula %>"
+                                    data-nombre="<%= est.nombre %> <%= est.apellido %>"
+                                    onclick="eliminarEstudianteDesdeBoton(this)">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }); %>
+                    <% }); %>
+                <% } %>
+                <tr id="noResultsRow" style="display: none;">
+                    <td colspan="8" style="text-align: center; padding: 3rem; color: #94a3b8;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 0.75rem; display:block;">
+                            <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        <p>Sin resultados para la búsqueda.</p>
+                    </td>
+                </tr>
+                <% if (!estudiantes || estudiantes.length === 0) { %>
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 4rem; color: #94a3b8;">
+                        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 1rem; opacity: 0.35; display:block;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">No hay estudiantes registrados</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 1.25rem;">Comience añadiendo el primer estudiante al sistema</p>
+                        <button onclick="abrirModalNuevoEstudiante()" style="padding: 0.75rem 1.5rem; background: var(--color-primario); color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 0.95rem;">
+                            Añadir Estudiante
+                        </button>
+                    </td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+
+
+<!-- ============================================================
+     MODAL: AÑADIR NUEVO ESTUDIANTE (CON DATOS COMPLETOS DE PLANILLA)
+     ============================================================ -->
+<div class="modal-overlay" id="modalNuevoEstudiante" style="z-index: 2000;">
+    <div class="modal-dialog" style="max-width: 760px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <div>
+                <h3 style="color: var(--color-primario-oscuro);">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle; margin-right: 8px; color: var(--color-primario);">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14"/>
+                    </svg>
+                    Añadir Estudiante (Registro y Planilla de Inscripción)
+                </h3>
+                <p style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">Los datos que ingrese aquí completarán automáticamente la planilla de inscripción oficial.</p>
+            </div>
+            <button class="btn-close-modal" onclick="cerrarModal('modalNuevoEstudiante')">×</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+            <form id="formNuevoEstudiante">
+
+                <!-- 1. DATOS DEL ESTUDIANTE -->
+                <div class="form-section-banner" style="margin-top: 0;">
+                    1. Datos de Identificación y Escolares del Estudiante
+                </div>
+
+                <!-- FOTO DE PERFIL DEL ESTUDIANTE -->
+                <div class="photo-uploader-box">
+                    <div class="photo-preview-wrap" id="nuevo_foto_preview_wrap">
+                        <div class="photo-preview-placeholder" id="nuevo_foto_placeholder">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                            </svg>
+                        </div>
+                        <img id="nuevo_foto_img" src="" alt="Vista previa" style="display:none;">
+                    </div>
+                    <div>
+                        <label class="btn-upload-photo" for="nuevo_foto">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                            </svg>
+                            Subir Foto Carnet
+                        </label>
+                        <button type="button" class="btn-remove-photo" id="btn_remover_nueva_foto" style="display:none;" onclick="removerFoto('nuevo')">Quitar</button>
+                        <input type="file" id="nuevo_foto" name="foto" accept="image/*" style="display:none;" onchange="previewFotoEstudiante(this, 'nuevo')">
+                        <div style="font-size: 0.78rem; color: #64748b; margin-top: 4px;">Formato carnet oficial (opcional)</div>
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="cedula">Cédula de Identidad (D.I.) *</label>
+                        <input type="text" id="cedula" name="cedula" placeholder="Ej: 30123456" required>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="nombre">Nombres *</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Ej: Jesús David" required>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="apellido">Apellidos *</label>
+                        <input type="text" id="apellido" name="apellido" placeholder="Ej: Pérez García" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="ano">Grado / Nivel *</label>
+                        <select id="ano" name="ano" required>
+                            <option value="">Seleccionar nivel...</option>
+                            <option value="Preescolar">Preescolar</option>
+                            <option value="1er Grado">1er Grado</option>
+                            <option value="2do Grado">2do Grado</option>
+                            <option value="3er Grado">3er Grado</option>
+                            <option value="4to Grado">4to Grado</option>
+                            <option value="5to Grado">5to Grado</option>
+                            <option value="6to Grado">6to Grado</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="seccion">Sección *</label>
+                        <select id="seccion" name="seccion" required>
+                            <option value="">Seleccione grado primero...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="lugar_nacimiento">Lugar de Nacimiento</label>
+                        <input type="text" id="lugar_nacimiento" name="lugar_nacimiento" placeholder="Ej: Caracas, Dto. Capital">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edad">Edad (Años)</label>
+                        <input type="text" id="edad" name="edad" placeholder="Ej: 7">
+                    </div>
+                </div>
+
+                <div class="form-grid-4" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-field-group">
+                        <label for="sexo">Sexo</label>
+                        <select id="sexo" name="sexo">
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="talla_camisa">Talla Camisa</label>
+                        <input type="text" id="talla_camisa" name="talla_camisa" placeholder="Ej: 8, 10, S">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="talla_pantalon">Talla Pantalón</label>
+                        <input type="text" id="talla_pantalon" name="talla_pantalon" placeholder="Ej: 8, 10, 12">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="talla_zapatos">Talla Zapatos</label>
+                        <input type="text" id="talla_zapatos" name="talla_zapatos" placeholder="Ej: 30, 32, 34">
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="estado">Estado del Estudiante</label>
+                        <select id="estado" name="estado">
+                            <option value="Activo">Activo</option>
+                            <option value="Inhabilitado">Inhabilitado (Graduado)</option>
+                            <option value="Retirado">Retirado</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="fecha_ingreso">Fecha de Ingreso *</label>
+                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" required>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="direccion_estudiante">Dirección del Alumno</label>
+                        <input type="text" id="direccion_estudiante" name="direccion_estudiante" placeholder="Lugar de residencia">
+                    </div>
+                </div>
+
+                <!-- 2. DATOS DE LA MADRE -->
+                <div class="form-section-banner">
+                    2. Datos de la Madre
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="madre_nombres">Nombres de la Madre</label>
+                        <input type="text" id="madre_nombres" name="madre_nombres" placeholder="Nombres">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="madre_apellidos">Apellidos de la Madre</label>
+                        <input type="text" id="madre_apellidos" name="madre_apellidos" placeholder="Apellidos">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="madre_cedula">Cédula de la Madre</label>
+                        <input type="text" id="madre_cedula" name="madre_cedula" placeholder="Ej: V-15.123.456">
+                    </div>
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="madre_fecha_nac">Fecha de Nacimiento</label>
+                        <input type="date" id="madre_fecha_nac" name="madre_fecha_nac">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="madre_telefono">N° de Teléfono</label>
+                        <input type="text" id="madre_telefono" name="madre_telefono" placeholder="Ej: 0414-1234567">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="madre_direccion">Dirección de Habitación</label>
+                        <input type="text" id="madre_direccion" name="madre_direccion" placeholder="Dirección">
+                    </div>
+                </div>
+
+                <!-- 3. DATOS DEL PADRE -->
+                <div class="form-section-banner">
+                    3. Datos del Padre
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="padre_nombres">Nombres del Padre</label>
+                        <input type="text" id="padre_nombres" name="padre_nombres" placeholder="Nombres">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="padre_apellidos">Apellidos del Padre</label>
+                        <input type="text" id="padre_apellidos" name="padre_apellidos" placeholder="Apellidos">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="padre_cedula">Cédula del Padre</label>
+                        <input type="text" id="padre_cedula" name="padre_cedula" placeholder="Ej: V-14.789.012">
+                    </div>
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="padre_fecha_nac">Fecha de Nacimiento</label>
+                        <input type="date" id="padre_fecha_nac" name="padre_fecha_nac">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="padre_telefono">N° de Teléfono</label>
+                        <input type="text" id="padre_telefono" name="padre_telefono" placeholder="Ej: 0424-9876543">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="padre_direccion">Dirección de Habitación</label>
+                        <input type="text" id="padre_direccion" name="padre_direccion" placeholder="Dirección">
+                    </div>
+                </div>
+
+                <!-- 4. DATOS DEL REPRESENTANTE LEGAL -->
+                <div class="form-section-banner">
+                    4. Datos del Representante Legal
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="rep_nombres">Nombres del Representante</label>
+                        <input type="text" id="rep_nombres" name="rep_nombres" placeholder="Nombres">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="rep_apellidos">Apellidos del Representante</label>
+                        <input type="text" id="rep_apellidos" name="rep_apellidos" placeholder="Apellidos">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="rep_cedula">Cédula del Representante</label>
+                        <input type="text" id="rep_cedula" name="rep_cedula" placeholder="Ej: V-15.654.321">
+                    </div>
+                </div>
+                <div class="form-grid-4" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-field-group">
+                        <label for="rep_fecha_nac">Fecha Nacimiento</label>
+                        <input type="date" id="rep_fecha_nac" name="rep_fecha_nac">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="rep_parentesco">Parentesco</label>
+                        <select id="rep_parentesco" name="rep_parentesco">
+                            <option value="Madre">Madre</option>
+                            <option value="Padre">Padre</option>
+                            <option value="Abuelo/a">Abuelo/a</option>
+                            <option value="Tío/a">Tío/a</option>
+                            <option value="Tutor Legal">Tutor Legal</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="rep_telefono">N° de Teléfono</label>
+                        <input type="text" id="rep_telefono" name="rep_telefono" placeholder="Ej: 0412-5551234">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="correo">Correo Electrónico</label>
+                        <input type="email" id="correo" name="correo" placeholder="correo@ejemplo.com">
+                    </div>
+                </div>
+                <div class="form-field-group">
+                    <label for="rep_direccion">Dirección de Habitación del Representante</label>
+                    <input type="text" id="rep_direccion" name="rep_direccion" placeholder="Dirección completa">
+                </div>
+
+                <div class="form-field-group">
+                    <label for="observaciones">Observaciones Adicionales</label>
+                    <textarea id="observaciones" name="observaciones" rows="2" placeholder="Notas médicas, observaciones académicas o institucionales..." style="resize: vertical;"></textarea>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="cerrarModal('modalNuevoEstudiante')">Cancelar</button>
+            <button class="btn-primary" type="button"
+                onclick="document.getElementById('formNuevoEstudiante').dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+                Guardar Registro Completo
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================
+     MODAL: MODIFICAR ESTUDIANTE EXISTENTE (CON TODOS LOS CAMPOS)
+     ============================================================ -->
+<div class="modal-overlay" id="modalEditarEstudiante" style="z-index: 2000;">
+    <div class="modal-dialog" style="max-width: 760px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <div>
+                <h3 style="color: var(--color-primario-oscuro);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle; margin-right: 8px; color: var(--color-primario);">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Modificar Perfil y Planilla del Estudiante
+                </h3>
+                <p style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">Actualice los datos personales, escolares o de representantes.</p>
+            </div>
+            <button class="btn-close-modal" onclick="cerrarModal('modalEditarEstudiante')">×</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+            <form id="formEditarEstudiante">
+                <input type="hidden" id="edit_cedula" name="cedula">
+                <input type="hidden" id="edit_eliminar_foto" name="eliminar_foto" value="false">
+
+                <!-- 1. DATOS DEL ESTUDIANTE -->
+                <div class="form-section-banner" style="margin-top: 0;">
+                    1. Datos de Identificación y Escolares del Estudiante
+                </div>
+
+                <!-- FOTO DE PERFIL DEL ESTUDIANTE -->
+                <div class="photo-uploader-box">
+                    <div class="photo-preview-wrap" id="edit_foto_preview_wrap">
+                        <div class="photo-preview-placeholder" id="edit_foto_placeholder">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                            </svg>
+                        </div>
+                        <img id="edit_foto_img" src="" alt="Foto estudiante" style="display:none;">
+                    </div>
+                    <div>
+                        <label class="btn-upload-photo" for="edit_foto">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                            </svg>
+                            Cambiar Foto
+                        </label>
+                        <button type="button" class="btn-remove-photo" id="btn_remover_edit_foto" style="display:none;" onclick="removerFoto('edit')">Quitar Foto</button>
+                        <input type="file" id="edit_foto" name="foto" accept="image/*" style="display:none;" onchange="previewFotoEstudiante(this, 'edit')">
+                        <div style="font-size: 0.78rem; color: #64748b; margin-top: 4px;">Foto tamaño carnet (opcional)</div>
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label>Cédula de Identidad (D.I.)</label>
+                        <div style="padding: 0.75rem 1rem; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: 700; color: #334155; font-family: monospace;" id="edit_cedula_display"></div>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_nombre">Nombres *</label>
+                        <input type="text" id="edit_nombre" name="nombre" required>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_apellido">Apellidos *</label>
+                        <input type="text" id="edit_apellido" name="apellido" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="edit_ano">Grado / Nivel *</label>
+                        <select id="edit_ano" name="ano" required>
+                            <option value="Preescolar">Preescolar</option>
+                            <option value="1er Grado">1er Grado</option>
+                            <option value="2do Grado">2do Grado</option>
+                            <option value="3er Grado">3er Grado</option>
+                            <option value="4to Grado">4to Grado</option>
+                            <option value="5to Grado">5to Grado</option>
+                            <option value="6to Grado">6to Grado</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_seccion">Sección *</label>
+                        <select id="edit_seccion" name="seccion" required>
+                            <option value="">Seleccione grado primero...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="edit_fecha_nacimiento">Fecha de Nacimiento</label>
+                        <input type="date" id="edit_fecha_nacimiento" name="fecha_nacimiento">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_lugar_nacimiento">Lugar de Nacimiento</label>
+                        <input type="text" id="edit_lugar_nacimiento" name="lugar_nacimiento">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_edad">Edad</label>
+                        <input type="text" id="edit_edad" name="edad">
+                    </div>
+                </div>
+
+                <div class="form-grid-4" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-field-group">
+                        <label for="edit_sexo">Sexo</label>
+                        <select id="edit_sexo" name="sexo">
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_talla_camisa">Talla Camisa</label>
+                        <input type="text" id="edit_talla_camisa" name="talla_camisa">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_talla_pantalon">Talla Pantalón</label>
+                        <input type="text" id="edit_talla_pantalon" name="talla_pantalon">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_talla_zapatos">Talla Zapatos</label>
+                        <input type="text" id="edit_talla_zapatos" name="talla_zapatos">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="edit_estado">Estado del Estudiante</label>
+                        <select id="edit_estado" name="estado">
+                            <option value="Activo">Activo</option>
+                            <option value="Inhabilitado">Inhabilitado (Graduado)</option>
+                            <option value="Retirado">Retirado</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_direccion_estudiante">Dirección de Habitación</label>
+                        <input type="text" id="edit_direccion_estudiante" name="direccion_estudiante">
+                    </div>
+                </div>
+
+                <!-- 2. DATOS DE LA MADRE -->
+                <div class="form-section-banner">
+                    2. Datos de la Madre
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="edit_madre_nombres">Nombres de la Madre</label>
+                        <input type="text" id="edit_madre_nombres" name="madre_nombres">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_madre_apellidos">Apellidos de la Madre</label>
+                        <input type="text" id="edit_madre_apellidos" name="madre_apellidos">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_madre_cedula">Cédula</label>
+                        <input type="text" id="edit_madre_cedula" name="madre_cedula">
+                    </div>
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="edit_madre_fecha_nac">Fecha de Nacimiento</label>
+                        <input type="date" id="edit_madre_fecha_nac" name="madre_fecha_nac">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_madre_telefono">N° de Teléfono</label>
+                        <input type="text" id="edit_madre_telefono" name="madre_telefono">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_madre_direccion">Dirección</label>
+                        <input type="text" id="edit_madre_direccion" name="madre_direccion">
+                    </div>
+                </div>
+
+                <!-- 3. DATOS DEL PADRE -->
+                <div class="form-section-banner">
+                    3. Datos del Padre
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="edit_padre_nombres">Nombres del Padre</label>
+                        <input type="text" id="edit_padre_nombres" name="padre_nombres">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_padre_apellidos">Apellidos del Padre</label>
+                        <input type="text" id="edit_padre_apellidos" name="padre_apellidos">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_padre_cedula">Cédula</label>
+                        <input type="text" id="edit_padre_cedula" name="padre_cedula">
+                    </div>
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="edit_padre_fecha_nac">Fecha de Nacimiento</label>
+                        <input type="date" id="edit_padre_fecha_nac" name="padre_fecha_nac">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_padre_telefono">N° de Teléfono</label>
+                        <input type="text" id="edit_padre_telefono" name="padre_telefono">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_padre_direccion">Dirección</label>
+                        <input type="text" id="edit_padre_direccion" name="padre_direccion">
+                    </div>
+                </div>
+
+                <!-- 4. DATOS DEL REPRESENTANTE LEGAL -->
+                <div class="form-section-banner">
+                    4. Datos del Representante Legal
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="edit_rep_nombres">Nombres del Representante</label>
+                        <input type="text" id="edit_rep_nombres" name="rep_nombres">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_rep_apellidos">Apellidos del Representante</label>
+                        <input type="text" id="edit_rep_apellidos" name="rep_apellidos">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_rep_cedula">Cédula</label>
+                        <input type="text" id="edit_rep_cedula" name="rep_cedula">
+                    </div>
+                </div>
+                <div class="form-grid-4" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-field-group">
+                        <label for="edit_rep_fecha_nac">Fecha Nacimiento</label>
+                        <input type="date" id="edit_rep_fecha_nac" name="rep_fecha_nac">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_rep_parentesco">Parentesco</label>
+                        <select id="edit_rep_parentesco" name="rep_parentesco">
+                            <option value="Madre">Madre</option>
+                            <option value="Padre">Padre</option>
+                            <option value="Abuelo/a">Abuelo/a</option>
+                            <option value="Tío/a">Tío/a</option>
+                            <option value="Tutor Legal">Tutor Legal</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_rep_telefono">N° de Teléfono</label>
+                        <input type="text" id="edit_rep_telefono" name="rep_telefono">
+                    </div>
+                    <div class="form-field-group">
+                        <label for="edit_correo">Correo Electrónico</label>
+                        <input type="email" id="edit_correo" name="correo">
+                    </div>
+                </div>
+                <div class="form-field-group">
+                    <label for="edit_rep_direccion">Dirección del Representante</label>
+                    <input type="text" id="edit_rep_direccion" name="rep_direccion">
+                </div>
+
+                <div class="form-field-group">
+                    <label for="edit_observaciones">Observaciones</label>
+                    <textarea id="edit_observaciones" name="observaciones" rows="2" style="resize: vertical;"></textarea>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="cerrarModal('modalEditarEstudiante')">Cancelar</button>
+            <button class="btn-primary" type="button"
+                onclick="document.getElementById('formEditarEstudiante').dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+                Guardar Cambios
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================
+     MODAL: ASCENSIÓN DE GRADO (confirmación con vista previa)
+     ============================================================ -->
+<div class="modal-overlay" id="modalAscension" style="z-index: 2200;">
+    <div class="modal-dialog" style="max-width: 640px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header" style="border-bottom: 2px solid #e2e8f0; background: #f8fafc;">
+            <div>
+                <h3 style="color: var(--color-primario-oscuro); font-size: 1.25rem;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="vertical-align: middle; margin-right: 6px;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                    Ascensión de Grado
+                </h3>
+                <p style="font-size: 0.85rem; color: #64748b; margin-top: 3px;">Revise los cambios antes de aplicarlos.</p>
+            </div>
+            <button class="btn-close-modal" onclick="cerrarModal('modalAscension')">×</button>
+        </div>
+        <div class="modal-body" id="ascensionResumen" style="overflow-y: auto; padding: 1.25rem 1.5rem; flex: 1;">
+            <!-- Se completa con JavaScript -->
+        </div>
+        <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid #e2e8f0;">
+            <button class="btn-secondary" onclick="cerrarModal('modalAscension')">Cancelar</button>
+            <button class="btn-primary" id="btnConfirmarAscension" onclick="confirmarAscension()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Confirmar ascensión
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="toastNotification" class="toast-notification"></div>
+
+<!-- JSON embed para precarga instantánea sin latencia -->
+<script id="estudiantes_db_json" type="application/json"><%- JSON.stringify(estudiantes || []) %></script>
+<script src="/scripts/ui.js"></script>
+<script src="/scripts/estudiantes.js"></script>
+</body>
+</html>

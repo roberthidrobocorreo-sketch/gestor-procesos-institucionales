@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio — Gestor Institucional | Escuela "Las Américas"</title>
+    <meta name="description" content="Panel principal del Gestor de Procesos de la Escuela Las Américas">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Tarjeta "Procesos realizados": siempre turquesa, sin importar el tema elegido en Ajustes.
+           Se vuelven a declarar las variables del tema solo dentro de esta tarjeta. */
+        .counter-card.counter-total {
+            --color-primario: #1381A2;
+            --color-primario-rgb: 19, 129, 162;
+            --color-primario-oscuro: #0B5E7B;
+            --color-primario-activo: #0D6884;
+            --color-primario-hover: #0F6E8A;
+            --color-primario-claro: #E0F2FE;
+            border-left-color: #1381A2 !important;
+        }
+        .counter-card.counter-total::before {
+            background: #1381A2 !important;
+        }
+        .counter-card.counter-total .counter-icon {
+            background: #E0F2FE !important;
+            color: #1381A2 !important;
+        }
+        .counter-card.counter-total .counter-number {
+            color: #1381A2 !important;
+        }
+    </style>
+</head>
+<body>
+
+<%- include('partials/sidebar') %>
+
+<main class="main-wrapper">
+
+    <!-- SALUDO + RELOJ DIGITAL (FIEL A LA IMAGEN) -->
+    <div class="clock-container">
+        <p class="hero-greeting">
+            Bienvenido/a de nuevo, <span class="user-name-tag"><%= nombreUsuario %></span>
+        </p>
+        <div class="digital-time">
+            <span id="liveClockDigits">00:00</span>
+            <span id="liveClockAmpm" class="am-pm">a.m.</span>
+        </div>
+        <p class="digital-date" id="liveClockDate">Cargando fecha...</p>
+    </div>
+
+    <!-- CONTADORES DE PROCESOS -->
+    <%
+        const pct = (n) => totalProcesos > 0 ? Math.round((n / totalProcesos) * 100) : 0;
+    %>
+    <section class="process-counters" aria-label="Resumen de procesos">
+
+        <a href="/procesos" class="counter-card counter-total">
+            <div class="counter-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+            </div>
+            <div class="counter-body">
+                <span class="counter-label">Procesos realizados</span>
+                <span class="counter-number"><%= totalProcesos %></span>
+                <span class="counter-caption">Total registrados en el sistema</span>
+            </div>
+        </a>
+
+        <a href="/procesos" class="counter-card counter-done">
+            <div class="counter-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <div class="counter-body">
+                <span class="counter-label">Procesos completados</span>
+                <span class="counter-number"><%= totalCompletados %></span>
+                <div class="counter-bar" aria-hidden="true"><span style="width: <%= pct(totalCompletados) %>%"></span></div>
+                <span class="counter-caption"><%= pct(totalCompletados) %>% del total</span>
+            </div>
+        </a>
+
+        <a href="/procesos" class="counter-card counter-pending">
+            <div class="counter-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="counter-body">
+                <span class="counter-label">Procesos en trámite</span>
+                <span class="counter-number"><%= totalEnTramite %></span>
+                <div class="counter-bar" aria-hidden="true"><span style="width: <%= pct(totalEnTramite) %>%"></span></div>
+                <span class="counter-caption"><%= pct(totalEnTramite) %>% del total</span>
+            </div>
+        </a>
+
+    </section>
+
+</main>
+
+<div id="toastNotification" class="toast-notification"></div>
+
+<script src="/scripts/ui.js"></script>
+<script src="/scripts/dashboard.js"></script>
+</body>
+</html>

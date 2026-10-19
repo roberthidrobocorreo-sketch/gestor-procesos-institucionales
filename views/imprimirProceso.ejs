@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= proceso.tipo_proceso %> — <%= proceso.nombre %> <%= proceso.apellido %> | Escuela "Las Américas"</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            color: #1e293b;
+        }
+        .print-controls {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+            max-width: 216mm;
+            justify-content: space-between;
+        }
+        .btn-print {
+            padding: 0.75rem 2rem;
+            background: #1381a2;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(19, 129, 162, 0.25);
+            transition: all 0.2s;
+        }
+        .btn-print:hover {
+            background: #0b5e7b;
+            transform: translateY(-1px);
+        }
+        .btn-back {
+            padding: 0.75rem 1.5rem;
+            background: #fff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-back:hover {
+            background: #f8fafc;
+        }
+        .document-sheet {
+            background: #ffffff;
+            width: 216mm;
+            min-height: 279mm;
+            padding: 16mm 20mm;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        /* ENCABEZADO INSTITUCIONAL */
+        .doc-header-table {
+            width: 100%;
+            border-bottom: 2.5px solid #0b5e7b;
+            padding-bottom: 14px;
+            margin-bottom: 22px;
+        }
+        .doc-header-table td {
+            vertical-align: middle;
+        }
+        .header-logo-cell {
+            width: 85px;
+            text-align: left;
+        }
+        .header-logo-cell img {
+            width: 76px;
+            height: 76px;
+            object-fit: contain;
+        }
+        .header-text-cell {
+            text-align: center;
+            padding: 0 10px;
+        }
+        .header-text-cell .country-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #475569;
+            letter-spacing: 0.5px;
+            line-height: 1.25;
+        }
+        .header-text-cell .school-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #0b5e7b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 3px 0;
+        }
+        .header-text-cell .school-meta {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .header-photo-cell {
+            width: 90px;
+            text-align: right;
+        }
+        .photo-box-doc {
+            width: 82px;
+            height: 98px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: #f8fafc;
+            overflow: hidden;
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 600;
+            line-height: 1.2;
+            padding: 4px;
+        }
+        .photo-box-doc img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* TÍTULOS */
+        .doc-title-box {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .doc-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: inline-block;
+            padding: 6px 18px;
+            border-bottom: 2px solid #1381a2;
+        }
+        .doc-subtitle {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #0b5e7b;
+            margin-top: 6px;
+        }
+
+        /* CUERPO DEL TEXTO */
+        .doc-body {
+            font-size: 0.98rem;
+            line-height: 1.9;
+            color: #1e293b;
+            text-align: justify;
+            flex: 1;
+        }
+        .doc-body p {
+            margin-bottom: 1.25rem;
+        }
+        .doc-body strong {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        /* TABLAS Y FORMULARIOS */
+        .doc-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: #0b5e7b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f1f5f9;
+            padding: 6px 10px;
+            border-left: 4px solid #1381a2;
+            margin-top: 14px;
+            margin-bottom: 8px;
+        }
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+        .doc-table th, .doc-table td {
+            border: 1px solid #cbd5e1;
+            padding: 6px 9px;
+            text-align: left;
+        }
+        .doc-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+        }
+        .doc-table td strong {
+            color: #0f172a;
+        }
+
+        /* SECCIÓN DE FIRMAS */
+        .signature-section {
+            margin-top: 35px;
+            display: flex;
+            justify-content: space-between;
+            gap: 1.5rem;
+            page-break-inside: avoid;
+        }
+        .signature-box {
+            flex: 1;
+            text-align: center;
+        }
+        .signature-line {
+            border-top: 1.5px solid #334155;
+            margin: 0 auto 6px;
+            width: 80%;
+        }
+        .signature-box p {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #334155;
+            line-height: 1.3;
+        }
+        .signature-box .role {
+            font-size: 0.74rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .doc-stamp-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 10px;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 0.72rem;
+            color: #94a3b8;
+        }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .print-controls { display: none; }
+            .document-sheet {
+                box-shadow: none;
+                border-radius: 0;
+                width: 100%;
+                min-height: auto;
+                padding: 10mm 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="print-controls">
+    <a href="/procesos" class="btn-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Volver a Procesos
+    </a>
+    <button class="btn-print" onclick="window.print()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimir Documento
+    </button>
+</div>
+
+<div class="document-sheet">
+
+    <!-- ENCABEZADO INSTITUCIONAL -->
+    <table class="doc-header-table">
+        <tr>
+            <td class="header-logo-cell">
+                <img src="/img/escudo.png" alt="Escuela Las Américas">
+            </td>
+            <td class="header-text-cell">
+                <div class="country-title">República Bolivariana de Venezuela<br>Ministerio del Poder Popular para la Educación</div>
+                <div class="school-name"><%= institucion.nombre_institucion %></div>
+                <div class="school-meta">
+                    Código DEA: <strong><%= institucion.codigo_dea %></strong> &nbsp;|&nbsp; Año Escolar: <strong><%= institucion.ano_escolar %></strong>
+                </div>
+            </td>
+            <td class="header-photo-cell">
+                <div class="photo-box-doc">
+                    <% if (proceso.foto) { %>
+                        <img src="<%= proceso.foto %>" alt="Foto">
+                    <% } else { %>
+                        FOTO<br>CARNET<br>3x4 cm
+                    <% } %>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <% 
+        const tipo = proceso.tipo_proceso || ''; 
+        const de = datosEspecificos || {};
+
+        function formatearFechaDoc(f) {
+            if (!f) return '—';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(f)) {
+                const parts = f.split('-');
+                const y = parts[0];
+                const m = parts[1];
+                const d = parts[2];
+                const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                const mesNom = meses[parseInt(m, 10) - 1] || m;
+                return `${parseInt(d, 10)} de ${mesNom} del ${y}`;
+            }
+            return f;
+        }
+    %>
+
+    <!-- 1. CASO: PLANILLA DE INSCRIPCIÓN -->
+    <% if (tipo.includes('Planilla de Inscripción') || tipo.includes('Inscripción')) { %>
+        <div class="doc-title-box">
+            <div class="doc-title">Planilla Oficial de Inscripción</div>
+            <div class="doc-subtitle">AÑO ESCOLAR: <%= institucion.ano_escolar %> &nbsp;|&nbsp; GRADO: <%= proceso.ano %> "<%= proceso.seccion %>"</div>
+        </div>
+
+        <div class="doc-body" style="line-height: 1.4;">
+            <!-- I. ESTUDIANTE -->
+            <div class="doc-section-title">I. Datos de Identificación del Estudiante</div>
+            <table class="doc-table">
+                <tr>
+                    <td style="width: 35%;"><strong>Apellidos:</strong> <%= de.est_apellidos || proceso.apellido %></td>
+                    <td style="width: 35%;"><strong>Nombres:</strong> <%= de.est_nombres || proceso.nombre %></td>
+                    <td style="width: 30%;"><strong>Cédula (D.I.):</strong> <%= de.est_cedula || proceso.estudiante_cedula %></td>
+                </tr>
+                <tr>
+                    <td><strong>Fecha de Nacimiento:</strong> <%= formatearFechaDoc(de.est_fecha_nac) %></td>
+                    <td><strong>Lugar de Nacimiento:</strong> <%= de.est_lugar_nac || '—' %></td>
+                    <td><strong>Edad:</strong> <%= de.est_edad || '—' %> &nbsp;|&nbsp; <strong>Sexo:</strong> <%= de.est_sexo || '—' %></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <strong>Tallas Escolares:</strong> &nbsp;&nbsp;
+                        Camisa: <strong><%= de.est_talla_camisa || '—' %></strong> &nbsp;&nbsp;|&nbsp;&nbsp;
+                        Pantalón: <strong><%= de.est_talla_pantalon || '—' %></strong> &nbsp;&nbsp;|&nbsp;&nbsp;
+                        Zapatos: <strong><%= de.est_talla_zapatos || '—' %></strong>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- II. MADRE -->
+            <div class="doc-section-title">II. Datos de la Madre</div>
+            <table class="doc-table">
+                <tr>
+                    <td style="width: 50%;"><strong>Nombres y Apellidos:</strong> <%= (de.madre_nombres || '') + ' ' + (de.madre_apellidos || '') || '—' %></td>
+                    <td style="width: 25%;"><strong>Cédula:</strong> <%= de.madre_cedula || '—' %></td>
+                    <td style="width: 25%;"><strong>Fecha Nac.:</strong> <%= formatearFechaDoc(de.madre_fecha_nac) %></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>Dirección:</strong> <%= de.madre_direccion || '—' %></td>
+                    <td><strong>Teléfono:</strong> <%= de.madre_telefono || '—' %></td>
+                </tr>
+            </table>
+
+            <!-- III. PADRE -->
+            <div class="doc-section-title">III. Datos del Padre</div>
+            <table class="doc-table">
+                <tr>
+                    <td style="width: 50%;"><strong>Nombres y Apellidos:</strong> <%= (de.padre_nombres || '') + ' ' + (de.padre_apellidos || '') || '—' %></td>
+                    <td style="width: 25%;"><strong>Cédula:</strong> <%= de.padre_cedula || '—' %></td>
+                    <td style="width: 25%;"><strong>Fecha Nac.:</strong> <%= formatearFechaDoc(de.padre_fecha_nac) %></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>Dirección:</strong> <%= de.padre_direccion || '—' %></td>
+                    <td><strong>Teléfono:</strong> <%= de.padre_telefono || '—' %></td>
+                </tr>
+            </table>
+
+            <!-- IV. REPRESENTANTE -->
+            <div class="doc-section-title">IV. Datos del Representante Legal</div>
+            <table class="doc-table">
+                <tr>
+                    <td style="width: 50%;"><strong>Nombres y Apellidos:</strong> <%= (de.rep_nombres || proceso.representante || '') + ' ' + (de.rep_apellidos || '') %></td>
+                    <td style="width: 25%;"><strong>Cédula:</strong> <%= de.rep_cedula || '—' %></td>
+                    <td style="width: 25%;"><strong>Parentesco:</strong> <%= de.rep_parentesco || 'Representante' %></td>
+                </tr>
+                <tr>
+                    <td><strong>Fecha Nac.:</strong> <%= formatearFechaDoc(de.rep_fecha_nac) %></td>
+                    <td><strong>Teléfono:</strong> <%= de.rep_telefono || proceso.telefono || '—' %></td>
+                    <td><strong>Dirección:</strong> <%= de.rep_direccion || '—' %></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- FIRMAS PLANILLA -->
+        <div class="signature-section" style="margin-top: 40px; display: flex; justify-content: center;">
+            <div class="signature-box" style="max-width: 320px; width: 100%; text-align: center;">
+                <div class="signature-line" style="border-top: 1.5px solid #334155; margin: 0 auto 8px; width: 85%;"></div>
+                <p style="font-size: 0.95rem; font-weight: 700; color: #1e293b;"><%= institucion.director %></p>
+                <p class="role" style="font-size: 0.8rem; color: #64748b;">Directora de la Institución</p>
+            </div>
+        </div>
+
+    <!-- 2. CASO: CARTA DE BUENA CONDUCTA -->
+    <% } else if (tipo.includes('Buena Conducta')) { %>
+        <div class="doc-title-box">
+            <div class="doc-title">Carta de Buena Conducta</div>
+        </div>
+
+        <div class="doc-body">
+            <p>
+                Quien suscribe, <strong><%= institucion.director %></strong>, en su carácter de Directora de la 
+                <strong><%= institucion.nombre_institucion %></strong>, ubicada bajo el Código DEA <strong><%= institucion.codigo_dea %></strong>, 
+                hace constar por medio de la presente comunicación oficial que el (la) estudiante:
+            </p>
+
+            <div style="background: #f8fafc; border-left: 4px solid #1381a2; padding: 14px 18px; margin: 18px 0; border-radius: 6px;">
+                <p style="margin-bottom: 6px;"><strong>Estudiante:</strong> <%= de.est_nombre_completo || (proceso.nombre + ' ' + proceso.apellido) %></p>
+                <p style="margin-bottom: 6px;"><strong>Cédula de Identidad (D.I.):</strong> <%= de.est_cedula || proceso.estudiante_cedula %></p>
+                <p style="margin-bottom: 6px;"><strong>Lugar de Nacimiento:</strong> <%= de.est_lugar_nac || 'República Bolivariana de Venezuela' %></p>
+                <p style="margin-bottom: 0;"><strong>Dirección de Habitación:</strong> <%= de.est_direccion || 'No especificada' %></p>
+            </div>
+
+            <p>
+                Durante su permanencia y trayectoria académica en esta institución, ha observado y demostrado:
+            </p>
+            
+            <p style="padding: 12px 16px; background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px; font-weight: 600; color: #166534;">
+                <%= de.conducta_observacion || 'UNA CONDUCTA INTACHABLE, alto sentido de responsabilidad, disciplina, respeto a las normas de convivencia escolar, a los símbolos patrios, a los docentes y demás miembros de la comunidad educativa.' %>
+            </p>
+
+            <p>
+                Constancia que se expide a petición de la parte interesada, en la ciudad correspondiente, con fecha 
+                <strong><%= formatearFechaDoc(proceso.fecha) %></strong>, para los fines legales y educativos que estime conveniente.
+            </p>
+        </div>
+
+        <div class="signature-section" style="margin-top: 45px; display: flex; justify-content: center;">
+            <div class="signature-box" style="max-width: 320px; width: 100%; text-align: center;">
+                <div class="signature-line" style="border-top: 1.5px solid #334155; margin: 0 auto 8px; width: 85%;"></div>
+                <p style="font-size: 0.95rem; font-weight: 700; color: #1e293b;"><%= institucion.director %></p>
+                <p class="role" style="font-size: 0.8rem; color: #64748b;">Directora de la Institución</p>
+            </div>
+        </div>
+
+    <!-- 3. CASO: CARTA DE ACEPTACIÓN -->
+    <% } else if (tipo.includes('Aceptación')) { %>
+        <div class="doc-title-box">
+            <div class="doc-title">Carta de Aceptación</div>
+        </div>
+
+        <div class="doc-body">
+            <p>
+                La Dirección de la <strong><%= institucion.nombre_institucion %></strong>, adscrita al Ministerio del Poder Popular 
+                para la Educación bajo el Código DEA <strong><%= institucion.codigo_dea %></strong>, por medio del presente documento hace constar que el (la) estudiante:
+            </p>
+
+            <div style="background: #f8fafc; border-left: 4px solid #1381a2; padding: 14px 18px; margin: 18px 0; border-radius: 6px;">
+                <p style="margin-bottom: 6px;"><strong>Estudiante:</strong> <%= de.est_nombre_completo || (proceso.nombre + ' ' + proceso.apellido) %></p>
+                <p style="margin-bottom: 6px;"><strong>Cédula de Identidad (D.I.):</strong> <%= de.est_cedula || proceso.estudiante_cedula %></p>
+                <p style="margin-bottom: 6px;"><strong>Lugar de Nacimiento:</strong> <%= de.est_lugar_nac || 'República Bolivariana de Venezuela' %></p>
+                <p style="margin-bottom: 0;"><strong>Dirección de Habitación:</strong> <%= de.est_direccion || 'No especificada' %></p>
+            </div>
+
+            <p>
+                Ha sido formalmente <strong>ACEPTADO(A)</strong> en nuestra institución para cursar estudios correspondientes al 
+                <strong><%= de.grado_aceptado || (proceso.ano + ' "' + proceso.seccion + '"') %></strong>, durante el Año Escolar 
+                <strong><%= de.ano_escolar || institucion.ano_escolar %></strong>.
+            </p>
+
+            <p>
+                Se emite la presente a solicitud de su representante legal para fines de formalización de matrícula e inscripción, en fecha 
+                <strong><%= formatearFechaDoc(proceso.fecha) %></strong>.
+            </p>
+        </div>
+
+        <div class="signature-section" style="margin-top: 45px; display: flex; justify-content: center;">
+            <div class="signature-box" style="max-width: 320px; width: 100%; text-align: center;">
+                <div class="signature-line" style="border-top: 1.5px solid #334155; margin: 0 auto 8px; width: 85%;"></div>
+                <p style="font-size: 0.95rem; font-weight: 700; color: #1e293b;"><%= institucion.director %></p>
+                <p class="role" style="font-size: 0.8rem; color: #64748b;">Directora de la Institución</p>
+            </div>
+        </div>
+
+    <!-- 4. CASO: CARTA DE RETIRO -->
+    <% } else if (tipo.includes('Retiro')) { %>
+        <div class="doc-title-box">
+            <div class="doc-title">Constancia de Retiro</div>
+        </div>
+
+        <div class="doc-body">
+            <p>
+                Por medio de la presente, la Dirección de la <strong><%= institucion.nombre_institucion %></strong>, Código DEA 
+                <strong><%= institucion.codigo_dea %></strong>, hace constar formalmente que el (la) estudiante:
+            </p>
+
+            <div style="background: #f8fafc; border-left: 4px solid #e11d48; padding: 14px 18px; margin: 18px 0; border-radius: 6px;">
+                <p style="margin-bottom: 6px;"><strong>Estudiante:</strong> <%= de.est_nombre_completo || (proceso.nombre + ' ' + proceso.apellido) %></p>
+                <p style="margin-bottom: 6px;"><strong>Edad:</strong> <%= de.est_edad || 'Edad escolar' %> &nbsp;|&nbsp; <strong>Lugar de Nacimiento:</strong> <%= de.est_lugar_nac || 'República Bolivariana de Venezuela' %></p>
+                <p style="margin-bottom: 0;"><strong>Grado y Sección que Cursaba:</strong> <%= de.grado_seccion || (proceso.ano + ' "' + proceso.seccion + '"') %></p>
+            </div>
+
+            <p>
+                Ha sido formalmente <strong>RETIRADO(A)</strong> de la matrícula escolar activa de este plantel por solicitud expresa de su representante legal, fundamentado en el siguiente motivo:
+            </p>
+
+            <p style="padding: 12px 16px; background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 8px; font-weight: 700; color: #9f1239;">
+                <%= de.motivo_retiro || proceso.descripcion || 'Cambio de residencia / Traslado de plantel' %>
+                <% if (de.escuela_destino) { %>
+                    <br><span style="font-weight: 500; font-size: 0.9rem; color: #475569;">Plantel de destino señalado: <%= de.escuela_destino %></span>
+                <% } %>
+            </p>
+
+            <p>
+                Se hace entrega de sus documentos académicos en regla. Se expide la presente en fecha 
+                <strong><%= formatearFechaDoc(proceso.fecha) %></strong>.
+            </p>
+        </div>
+
+        <div class="signature-section" style="margin-top: 45px; display: flex; justify-content: center;">
+            <div class="signature-box" style="max-width: 320px; width: 100%; text-align: center;">
+                <div class="signature-line" style="border-top: 1.5px solid #334155; margin: 0 auto 8px; width: 85%;"></div>
+                <p style="font-size: 0.95rem; font-weight: 700; color: #1e293b;"><%= institucion.director %></p>
+                <p class="role" style="font-size: 0.8rem; color: #64748b;">Directora de la Institución</p>
+            </div>
+        </div>
+
+    <!-- 5. CASO: CONSTANCIA / CERTIFICADO DE PROMOCIÓN (6TO GRADO) -->
+    <% } else if (tipo.includes('Promoción') || tipo.includes('Certificado')) { %>
+        <div class="doc-title-box">
+            <div class="doc-title">Certificado de Promoción</div>
+            <div class="doc-subtitle">EDUCACIÓN PRIMARIA BÁSICA (6TO GRADO)</div>
+        </div>
+
+        <div class="doc-body">
+            <p>
+                La suscrita, <strong><%= institucion.director %></strong>, Directora de la <strong><%= institucion.nombre_institucion %></strong>, 
+                adscrita al Ministerio del Poder Popular para la Educación, Código DEA <strong><%= institucion.codigo_dea %></strong>, 
+                certifica por medio del presente documento que el (la) estudiante:
+            </p>
+
+            <div style="background: #f8fafc; border-left: 4px solid #16a34a; padding: 14px 18px; margin: 18px 0; border-radius: 6px;">
+                <p style="margin-bottom: 6px;"><strong>Nombres y Apellidos:</strong> <%= de.est_nombre_completo || (proceso.nombre + ' ' + proceso.apellido) %></p>
+                <p style="margin-bottom: 6px;"><strong>Cédula de Identidad (D.I. / C.I.):</strong> <%= de.est_cedula || proceso.estudiante_cedula %></p>
+                <p style="margin-bottom: 6px;"><strong>Lugar de Nacimiento:</strong> <%= de.est_lugar_nac || 'República Bolivariana de Venezuela' %></p>
+                <p style="margin-bottom: 0;"><strong>Edad / Fecha de Nacimiento:</strong> <%= de.est_edad_fecha_nac || '—' %></p>
+            </div>
+
+            <p>
+                Cursó y <strong>APROBÓ</strong> satisfactoriamente las áreas de aprendizaje y competencias correspondientes al 
+                <strong>6TO GRADO DE EDUCACIÓN PRIMARIA</strong> durante el Año Escolar <strong><%= de.ano_escolar_cursado || institucion.ano_escolar %></strong>, 
+                obteniendo la siguiente calificación final:
+            </p>
+
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <div style="display: inline-block; padding: 1rem 3rem; background: #f0fdf4; border: 2.5px solid #16a34a; border-radius: 12px;">
+                    <span style="font-size: 2rem; font-weight: 800; color: #15803d;">LITERAL "<%= de.literal_obtenido || 'A' %>"</span>
+                    <p style="font-size: 0.85rem; color: #166534; font-weight: 600; margin-top: 4px;">
+                        <%
+                            const significadosLiteral = {
+                                A: 'El alumno alcanzó todas las competencias y en algunos casos superó las expectativas para el grado.',
+                                B: 'El alumno alcanzó todas las competencias previstas para el grado.',
+                                C: 'El alumno alcanzó la mayoría de las competencias previstas para el grado.',
+                                D: 'El alumno alcanzó algunas de las competencias previstas para el grado, pero requiere de un proceso de nivelación al inicio de año escolar para alcanzar las restantes.'
+                            };
+                        %>
+                        <%= significadosLiteral[de.literal_obtenido] || significadosLiteral.A %>
+                    </p>
+                </div>
+            </div>
+
+            <p>
+                Por cuanto ha cumplido a cabalidad con los requisitos exigidos por el Ministerio del Poder Popular para la Educación, 
+                queda promovido(a) formalmente para cursar el <strong>1er Año de Educación Media General</strong>.
+            </p>
+
+            <p>
+                Certificado que se expide a los <strong><%= formatearFechaDoc(proceso.fecha) %></strong>.
+            </p>
+        </div>
+
+        <div class="signature-section" style="margin-top: 45px; display: flex; justify-content: center;">
+            <div class="signature-box" style="max-width: 320px; width: 100%; text-align: center;">
+                <div class="signature-line" style="border-top: 1.5px solid #334155; margin: 0 auto 8px; width: 85%;"></div>
+                <p style="font-size: 0.95rem; font-weight: 700; color: #1e293b;"><%= institucion.director %></p>
+                <p class="role" style="font-size: 0.8rem; color: #64748b;">Directora de la Institución</p>
+            </div>
+        </div>
+
+    <!-- 6. CASO: CONSTANCIA GENÉRICA / CONSTANCIA DE ESTUDIO / OTRO -->
+    <% } else { %>
+        <div class="doc-title-box">
+            <div class="doc-title"><%= proceso.tipo_proceso %></div>
+        </div>
+
+        <div class="doc-body">
+            <p>
+                Quien suscribe, <strong><%= institucion.director %></strong>, en su carácter de Directora de la 
+                <strong><%= institucion.nombre_institucion %></strong>, hace constar por medio de la presente comunicación que el (la) estudiante:
+            </p>
+
+            <div style="background: #f8fafc; border-left: 4px solid #1381a2; padding: 14px 18px; margin: 18px 0; border-radius: 6px;">
+                <p style="margin-bottom: 6px;"><strong>Estudiante:</strong> <%= proceso.nombre %> <%= proceso.apellido %></p>
+                <p style="margin-bottom: 6px;"><strong>Cédula de Identidad:</strong> <%= proceso.estudiante_cedula %></p>
+                <p style="margin-bottom: 6px;"><strong>Grado / Sección:</strong> <%= proceso.ano %> "<%= proceso.seccion %>"</p>
+                <p style="margin-bottom: 0;"><strong>Representante:</strong> <%= proceso.representante || '—' %></p>
+            </div>
+
+            <p>
+                <% if (proceso.descripcion) { %>
+                    El trámite institucional corresponde a: <strong><%= proceso.descripcion %></strong>
+                <% } else { %>
+                    El proceso fue registrado y verificado conforme a las normativas de la <strong><%= institucion.nombre_institucion %></strong> durante el Año Escolar <strong><%= institucion.ano_escolar %></strong>.
+                <% } %>
+            </p>
+
+            <p>
+                La presente constancia se expide a petición de la parte interesada, a fecha de 
+                <strong><%= formatearFechaDoc(proceso.fecha) %></strong>.
+            </p>
+        </div>
+
+        <div class="signature-section" style="margin-top: 45px; display: flex; justify-content: center;">
+            <div class="signature-box" style="max-width: 320px; width: 100%; text-align: center;">
+                <div class="signature-line" style="border-top: 1.5px solid #334155; margin: 0 auto 8px; width: 85%;"></div>
+                <p style="font-size: 0.95rem; font-weight: 700; color: #1e293b;"><%= institucion.director %></p>
+                <p class="role" style="font-size: 0.8rem; color: #64748b;">Directora de la Institución</p>
+            </div>
+        </div>
+    <% } %>
+
+    <div class="doc-stamp-footer">
+        Documento oficial emitido por el Sistema Gestor de Procesos Institucionales &mdash; Proceso #<%= proceso.id %> &mdash; Escuela "Las Américas"
+    </div>
+
+</div>
+
+</body>
+</html>
